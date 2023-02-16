@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/reto
+    username: root
+    password: 1701712480
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  application:
+    name: plaza_comida
+
+  cloud:
+    config:
+      uri: http://localhost:8082
+      username: root
+      password: s3cr3t
+      profile: dev
