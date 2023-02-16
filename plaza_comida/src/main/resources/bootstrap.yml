@@ -12,7 +12,7 @@ spring:
       ddl-auto: update
 
   application:
-    name: plaza-comida
+    name: plaza_comida
 
   cloud:
     config:
