@@ -6,6 +6,10 @@ spring:
     url: jdbc:mysql://localhost:3306/reto
     username: root
     password: 1701712480
+  security:
+    user:
+      name: root
+      password: s3cr3t
 
   jpa:
     hibernate:
@@ -14,4 +18,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8099/eureka
+      default-zone: http://localhost:8099/eureka
