@@ -1,8 +1,10 @@
 package com.example.plaza_comidas.infrastructure.input.rest;
 
 import com.example.plaza_comidas.application.dto.request.RestaurantRequestDto;
+import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IRestaurantHandler;
+import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +28,36 @@ public class RestaurantRestController {
     private final IRestaurantHandler restaurantHandler;
 
     @PostMapping("/")
-    public ResponseEntity<HashMap> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto, BindingResult bindingResult) {
+    public ResponseEntity<ResponseDto> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto, BindingResult bindingResult) {
+        ResponseDto responseDto = new ResponseDto();
 
         if (bindingResult.hasErrors()) {
-            return ValidationErrors(bindingResult);
+            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+
+            responseDto.setError(true);
+            responseDto.setMessage("Error en las validaciones");
+            responseDto.setData(errors);
+
+            return ResponseEntity.badRequest().body(responseDto);
         }
 
-        restaurantHandler.saveRestaurant(restaurantRequestDto);
+        try {
+            RestaurantResponseDto restaurantResponseDto = restaurantHandler.saveRestaurant(restaurantRequestDto);
+            if (restaurantResponseDto == null) {
+                responseDto.setError(true);
+                responseDto.setMessage("El usuario debe ser propietario");
+                responseDto.setData(null);
+            } else {
+                responseDto.setError(false);
+                responseDto.setMessage(null);
+                responseDto.setData(restaurantResponseDto);
+            }
+        } catch (Exception ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno del servidor");
+            responseDto.setData(null);
+        }
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
