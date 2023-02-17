@@ -4,7 +4,10 @@ import com.example.plaza_comidas.application.dto.request.RestaurantRequestDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IRestaurantHandler;
-import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,11 @@ public class RestaurantRestController {
 
     private final IRestaurantHandler restaurantHandler;
 
+    @Operation(summary = "Add a new restaurant")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Restaurant created", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Restaurant validation failed BadRequest", content = @Content)
+    })
     @PostMapping("/")
     public ResponseEntity<ResponseDto> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto, BindingResult bindingResult) {
         ResponseDto responseDto = new ResponseDto();
@@ -43,11 +51,7 @@ public class RestaurantRestController {
 
         try {
             RestaurantResponseDto restaurantResponseDto = restaurantHandler.saveRestaurant(restaurantRequestDto);
-            if (restaurantResponseDto == null) {
-                responseDto.setError(true);
-                responseDto.setMessage("El usuario debe ser propietario");
-                responseDto.setData(null);
-            } else {
+            if (restaurantResponseDto != null) {
                 responseDto.setError(false);
                 responseDto.setMessage(null);
                 responseDto.setData(restaurantResponseDto);
@@ -58,7 +62,7 @@ public class RestaurantRestController {
             responseDto.setData(null);
         }
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/")
