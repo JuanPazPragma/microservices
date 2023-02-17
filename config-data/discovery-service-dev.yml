@@ -9,8 +9,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      default-zone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
-      defaultZone: http://root:s3cr3t@localhost:8099/eureka/
+      defaultZone: http://localhost:8099/eureka/
 
 spring:
   security:
