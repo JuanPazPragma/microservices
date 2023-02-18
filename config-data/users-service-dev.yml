@@ -1,0 +1,25 @@
+
+server:
+  port: 8091
+
+spring:
+  application:
+    name: users-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/retousuarios
+    username: root
+    password: 1701712480
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:admin1@localhost:8099/eureka/
+
+appDescription: "Pragma Challenge"
+appVersion: "1.0.0"
+

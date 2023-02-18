@@ -4,15 +4,13 @@ server:
 eureka:
   instance:
     hostname: localhost
-
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://localhost:8099/eureka/
-
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@localhost:8099/eureka/
 spring:
   security:
     user:
-      name: root
-      password: s3cr3t
+      name: admin
+      password: admin1
