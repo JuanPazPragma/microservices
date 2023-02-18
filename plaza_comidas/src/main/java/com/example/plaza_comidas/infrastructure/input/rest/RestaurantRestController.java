@@ -62,7 +62,8 @@ public class RestaurantRestController {
             responseDto.setData(null);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.ok(responseDto);
+        //return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/")
