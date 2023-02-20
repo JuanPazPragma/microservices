@@ -1,6 +1,8 @@
 package com.example.usuarios.infrastructure.input.rest;
 
+import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
+import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,12 +36,22 @@ public class UserRestController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult){
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userHandler.register(userRequestDto));
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
+        return ResponseEntity.ok(userHandler.authenticate(authenticationRequestDto));
+    }
+
+    private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {
         List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 
-        HashMap<String, Object> message = new HashMap<String,Object>();
-        message.put("Error en el formulario",true);
-        message.put("Errores",errors);
+        HashMap<String, Object> message = new HashMap<String, Object>();
+        message.put("Error en el formulario", true);
+        message.put("Errores", errors);
         return ResponseEntity.badRequest().body(message);
     }
 }

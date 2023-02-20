@@ -3,6 +3,9 @@ package com.example.usuarios.domain.usecase;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
+import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
+
+import java.util.Optional;
 
 public class UserUseCase implements IUserServicePort {
 
@@ -17,5 +20,10 @@ public class UserUseCase implements IUserServicePort {
     public UserModel saveUser(UserModel userModel) {
         userPersistencePort.saveUser(userModel);
         return userModel;
+    }
+
+    @Override
+    public Optional<UserEntity> findUserByEmail(String email) {
+        return userPersistencePort.findUserByEmail(email);
     }
 }
