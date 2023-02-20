@@ -1,5 +1,6 @@
 package com.example.usuarios.domain.usecase;
 
+import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
@@ -17,9 +18,8 @@ public class UserUseCase implements IUserServicePort {
 
 
     @Override
-    public UserModel saveUser(UserModel userModel) {
-        userPersistencePort.saveUser(userModel);
-        return userModel;
+    public AuthenticationResponseDto saveUser(UserModel userModel) {
+        return userPersistencePort.saveUser(userModel);
     }
 
     @Override

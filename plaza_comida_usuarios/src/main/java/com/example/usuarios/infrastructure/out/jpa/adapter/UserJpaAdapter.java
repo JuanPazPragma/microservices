@@ -1,5 +1,7 @@
 package com.example.usuarios.infrastructure.out.jpa.adapter;
 
+import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
+import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
@@ -16,18 +18,20 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-
+    private final IJwtHandler jwtHandler;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserModel saveUser(UserModel userModel) {
+    public AuthenticationResponseDto saveUser(UserModel userModel) {
+        UserEntity userEntity = userEntityMapper.toEntity(userModel);
+        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
 
-        UserModel user = userModel;
-        //user.setPassword(passwordEncoder.encode(userModel.getPassword()));
+        userRepository.save(userEntity);
 
-        userRepository.save(userEntityMapper.toEntity(user));
-        return user;
+        var jwtToken = jwtHandler.generateToken(userEntity);
+
+        return AuthenticationResponseDto.builder().token(jwtToken).build();
     }
 
     @Override

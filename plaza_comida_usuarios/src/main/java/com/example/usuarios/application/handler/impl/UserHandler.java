@@ -13,6 +13,7 @@ import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,6 @@ public class UserHandler implements IUserHandler {
     private final IUserRequestMapper userRequestMapper;
     private final IJwtHandler jwtHandler;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -43,35 +43,20 @@ public class UserHandler implements IUserHandler {
 
     @Override
     public AuthenticationResponseDto register(UserRequestDto userRequestDto) {
-        var user = UserEntity.builder()
-                .name(userRequestDto.getName())
-                .lastName(userRequestDto.getLastName())
-                .idNumber(userRequestDto.getIdNumber())
-                .phone(userRequestDto.getPhone())
-                .email(userRequestDto.getEmail())
-                .password(passwordEncoder.encode(userRequestDto.getPassword()))
-                .build();
-        var jwtToken = jwtHandler.generateToken(user);
-
         RolModel rolModel = new RolModel();
         rolModel.setId(userRequestDto.getRolId());
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userModel.setRolId(rolModel);
 
-        userServicePort.saveUser(userModel);
-
-        return AuthenticationResponseDto.builder().token(jwtToken).build();
+        return userServicePort.saveUser(userModel);
     }
 
     @Override
     public AuthenticationResponseDto authenticate(AuthenticationRequestDto authenticationRequestDto) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        authenticationRequestDto.getEmail(),
-                        authenticationRequestDto.getPassword()
-                )
-        );
+        UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(authenticationRequestDto.getEmail(), authenticationRequestDto.getPassword());
+
+        authenticationManager.authenticate(credentials);
 
         var user = userServicePort.findUserByEmail(authenticationRequestDto.getEmail()).orElseThrow();
         var jwtToken = jwtHandler.generateToken(user);

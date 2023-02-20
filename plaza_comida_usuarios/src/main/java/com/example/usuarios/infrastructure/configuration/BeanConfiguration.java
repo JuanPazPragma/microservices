@@ -1,5 +1,6 @@
 package com.example.usuarios.infrastructure.configuration;
 
+import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
 import com.example.usuarios.domain.usecase.UserUseCase;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfiguration {
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
+    private final IJwtHandler jwtHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,7 +33,7 @@ public class BeanConfiguration {
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
-        return new UserJpaAdapter(userRepository, userEntityMapper);
+        return new UserJpaAdapter(userRepository, userEntityMapper, jwtHandler);
     }
 
     @Bean

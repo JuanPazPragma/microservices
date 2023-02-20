@@ -25,8 +25,8 @@ public class RestaurantHandler implements IRestaurantHandler {
     @Override
     public RestaurantResponseDto saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
         RestaurantModel restaurantModel = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
-        restaurantServicePort.saveRestaurant(restaurantModel);
-        return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurantModel.getId()));
+        RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
+        return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurant.getId()));
     }
 
     @Override

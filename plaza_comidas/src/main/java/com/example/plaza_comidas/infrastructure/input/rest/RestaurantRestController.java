@@ -37,6 +37,7 @@ public class RestaurantRestController {
     })
     @PostMapping("/")
     public ResponseEntity<ResponseDto> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto, BindingResult bindingResult) {
+
         ResponseDto responseDto = new ResponseDto();
 
         if (bindingResult.hasErrors()) {
@@ -58,7 +59,7 @@ public class RestaurantRestController {
             }
         } catch (Exception ex) {
             responseDto.setError(true);
-            responseDto.setMessage("Error interno del servidor");
+            responseDto.setMessage(ex.getMessage());
             responseDto.setData(null);
         }
 
