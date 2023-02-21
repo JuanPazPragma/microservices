@@ -1,8 +1,6 @@
 package com.example.usuarios.application.handler.impl;
 
-import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
-import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.application.mapper.request.IUserRequestMapper;
@@ -12,12 +10,10 @@ import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,24 +38,18 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
-    public AuthenticationResponseDto register(UserRequestDto userRequestDto) {
-        RolModel rolModel = new RolModel();
-        rolModel.setId(userRequestDto.getRolId());
-
-        UserModel userModel = userRequestMapper.toUser(userRequestDto);
-        userModel.setRolId(rolModel);
-
-        return userServicePort.saveUser(userModel);
+    public Optional<UserEntity> getByUserName(String userName) {
+        return userServicePort.getByUserName(userName);
     }
 
     @Override
-    public AuthenticationResponseDto authenticate(AuthenticationRequestDto authenticationRequestDto) {
-        UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(authenticationRequestDto.getEmail(), authenticationRequestDto.getPassword());
-
-        authenticationManager.authenticate(credentials);
-
-        var user = userServicePort.findUserByEmail(authenticationRequestDto.getEmail()).orElseThrow();
-        var jwtToken = jwtHandler.generateToken(user);
-        return AuthenticationResponseDto.builder().token(jwtToken).build();
+    public Boolean existsByUserName(String name) {
+        return userServicePort.existsUserByName(name);
     }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return userServicePort.existsUserByEmail(email);
+    }
+
 }

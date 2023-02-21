@@ -36,16 +36,6 @@ public class UserRestController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.ok(userHandler.register(userRequestDto));
-    }
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
-        return ResponseEntity.ok(userHandler.authenticate(authenticationRequestDto));
-    }
-
     private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {
         List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 
