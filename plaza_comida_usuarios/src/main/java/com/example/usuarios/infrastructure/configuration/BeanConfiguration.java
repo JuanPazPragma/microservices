@@ -5,6 +5,7 @@ import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
 import com.example.usuarios.domain.usecase.UserUseCase;
 import com.example.usuarios.infrastructure.out.jpa.adapter.UserJpaAdapter;
+import com.example.usuarios.infrastructure.out.jpa.mapper.IRolEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfiguration {
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
+    private final IRolEntityMapper rolEntityMapper;
+    private final IJwtHandler jwtHandler;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
