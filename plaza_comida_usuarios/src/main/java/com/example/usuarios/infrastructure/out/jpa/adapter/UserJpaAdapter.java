@@ -5,6 +5,7 @@ import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
+import com.example.usuarios.infrastructure.out.jpa.mapper.IRolEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;

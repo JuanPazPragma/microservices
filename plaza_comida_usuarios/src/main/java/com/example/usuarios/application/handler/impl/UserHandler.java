@@ -3,6 +3,7 @@ package com.example.usuarios.application.handler.impl;
 import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
+import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.application.mapper.request.IUserRequestMapper;
@@ -13,11 +14,14 @@ import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +65,24 @@ public class UserHandler implements IUserHandler {
         var user = userServicePort.findUserByEmail(authenticationRequestDto.getEmail()).orElseThrow();
         var jwtToken = jwtHandler.generateToken(user);
         return AuthenticationResponseDto.builder().token(jwtToken).build();
+    }
+
+    @Override
+    public JwtResponseDto login(AuthenticationRequestDto authenticationRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authenticationRequestDto.getEmail(),
+                        authenticationRequestDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        var user = userServicePort.findUserByEmail(authenticationRequestDto.getEmail()).orElseThrow();
+        var jwtToken = jwtHandler.generateToken(user);
+
+        //Date expirationTokenDate = jwtHandler.extractExpiration(jwtToken);
+        UserEntity userEntity = (UserEntity) authentication.getPrincipal();
+        JwtResponseDto jwtResponseDto = new JwtResponseDto();
+        jwtResponseDto.setToken(jwtToken);
+        jwtResponseDto.setBearer(userEntity.getEmail());
+        jwtResponseDto.setUserName(userEntity.getName());
+        jwtResponseDto.setAuthorities(userEntity.getAuthorities());
+        return jwtResponseDto;
     }
 }

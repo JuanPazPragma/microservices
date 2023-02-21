@@ -3,6 +3,7 @@ package com.example.usuarios.infrastructure.input.rest;
 import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
+import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,11 @@ public class UserRestController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
         return ResponseEntity.ok(userHandler.authenticate(authenticationRequestDto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponseDto> login(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
+        return ResponseEntity.ok(userHandler.login(authenticationRequestDto));
     }
 
     private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {
