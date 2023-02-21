@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationRestController {
 
     @GetMapping("/")
-    public String register(){
-        return "Hola mundo";
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok("Hello from secured endpoint");
     }
 }

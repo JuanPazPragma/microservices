@@ -25,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfiguration {
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-    private final IRolEntityMapper rolEntityMapper;
     private final IJwtHandler jwtHandler;
 
     @Bean
