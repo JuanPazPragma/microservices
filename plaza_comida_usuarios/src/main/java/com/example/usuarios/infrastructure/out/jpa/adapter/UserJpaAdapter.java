@@ -13,7 +13,6 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
