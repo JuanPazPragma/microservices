@@ -1,6 +1,5 @@
 package com.example.usuarios.domain.usecase;
 
-import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
@@ -18,12 +17,22 @@ public class UserUseCase implements IUserServicePort {
 
 
     @Override
-    public AuthenticationResponseDto saveUser(UserModel userModel) {
+    public UserModel saveUser(UserModel userModel) {
         return userPersistencePort.saveUser(userModel);
     }
 
     @Override
-    public Optional<UserEntity> findUserByEmail(String email) {
-        return userPersistencePort.findUserByEmail(email);
+    public Boolean existsUserByEmail(String email) {
+        return userPersistencePort.existsUserByEmail(email);
+    }
+
+    @Override
+    public Boolean existsUserByName(String name) {
+        return userPersistencePort.existsUserByName(name);
+    }
+
+    @Override
+    public Optional<UserEntity> getByUserName(String name) {
+        return userPersistencePort.getByUser(name);
     }
 }

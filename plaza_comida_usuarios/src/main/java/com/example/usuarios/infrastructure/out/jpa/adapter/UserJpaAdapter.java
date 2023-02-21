@@ -19,25 +19,32 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-    private final IJwtHandler jwtHandler;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public AuthenticationResponseDto saveUser(UserModel userModel) {
+    public UserModel saveUser(UserModel userModel) {
         UserEntity userEntity = userEntityMapper.toEntity(userModel);
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
 
         userRepository.save(userEntity);
 
-        var jwtToken = jwtHandler.generateToken(userEntity);
-
-        return AuthenticationResponseDto.builder().token(jwtToken).build();
+        return userModel;
     }
 
     @Override
-    public Optional<UserEntity> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Boolean existsUserByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Boolean existsUserByName(String name) {
+        return userRepository.existsByEmail(name);
+    }
+
+    @Override
+    public Optional<UserEntity> getByUser(String name) {
+        return userRepository.findByName(name);
     }
 
 }
