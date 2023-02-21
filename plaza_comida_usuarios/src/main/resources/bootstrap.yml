@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: users-service
+
+  cloud:
+    config:
+      uri: http://localhost:8082
+      username: root
+      password: 12345
+      profile: dev
+
+
+
