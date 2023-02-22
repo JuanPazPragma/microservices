@@ -1,12 +1,17 @@
 package com.example.usuarios.infrastructure.configuration;
 
 import com.example.usuarios.application.handler.IJwtHandler;
+import com.example.usuarios.domain.api.IRolServicePort;
 import com.example.usuarios.domain.api.IUserServicePort;
+import com.example.usuarios.domain.spi.IRolPersistencePort;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
+import com.example.usuarios.domain.usecase.RolUseCase;
 import com.example.usuarios.domain.usecase.UserUseCase;
+import com.example.usuarios.infrastructure.out.jpa.adapter.RolJpaAdapter;
 import com.example.usuarios.infrastructure.out.jpa.adapter.UserJpaAdapter;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IRolEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IUserEntityMapper;
+import com.example.usuarios.infrastructure.out.jpa.repository.IRolRepository;
 import com.example.usuarios.infrastructure.out.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +30,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class BeanConfiguration {
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
+    private final IRolRepository rolRepository;
+    private final IRolEntityMapper rolEntityMapper;
     private final IJwtHandler jwtHandler;
 
     @Bean
@@ -41,6 +48,17 @@ public class BeanConfiguration {
     public IUserServicePort userServicePort() {
         return new UserUseCase(userPersistencePort());
     }
+
+    @Bean
+    public IRolPersistencePort rolPersistencePort() {
+        return new RolJpaAdapter(rolRepository, rolEntityMapper);
+    }
+
+    @Bean
+    public IRolServicePort rolServicePort() {
+        return new RolUseCase(rolPersistencePort());
+    }
+
 
     @Bean
     public UserDetailsService userDetailsService() {

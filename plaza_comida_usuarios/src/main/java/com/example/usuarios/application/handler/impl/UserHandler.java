@@ -60,9 +60,9 @@ public class UserHandler implements IUserHandler {
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userModel.setRolId(rolModel);
 
-        //userResponseMapper.toResponse(userModel, rolResponseMapper.toResponse(rolModel));
+        return userResponseMapper.toResponse(userModel, rolResponseMapper.toResponse(rolModel));
 
-        return userRequestMapper.toDto(userServicePort.saveUser(userModel));
+        //return userRequestMapper.toDto(userServicePort.saveUser(userModel));
     }
 
     @Override
