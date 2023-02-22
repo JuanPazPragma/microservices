@@ -1,5 +1,6 @@
 package com.example.usuarios.application.mapper.request;
 
+import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.domain.model.UserModel;
@@ -15,5 +16,6 @@ public interface IUserRequestMapper {
     @Mapping(source = "userRequestDto.rolId", target = "rolId.id")
     UserModel toUser(UserRequestDto userRequestDto);
     UserResponseDto toDto(UserModel userModel);
+    UserRequestDto toUserRequestDto(RegisterRequestDto registerRequestDto);
 
 }
