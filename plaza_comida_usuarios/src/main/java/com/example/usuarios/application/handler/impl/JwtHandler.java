@@ -18,7 +18,7 @@ import java.util.function.Function;
 @Service
 public class JwtHandler implements IJwtHandler {
 
-    private static final String SECRET_KEY = "442A472D4B6150645367566B59703373367639792F423F4528482B4D62516554";
+    private static final String SECRET_KEY = "703373357638792F423F4528482B4D6251655468576D5A7134743777397A2443";
 
     @Override
     public String extractUserName(String token) {
@@ -55,7 +55,6 @@ public class JwtHandler implements IJwtHandler {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
