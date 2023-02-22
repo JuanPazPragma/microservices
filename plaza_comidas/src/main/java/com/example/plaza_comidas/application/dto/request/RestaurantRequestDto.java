@@ -18,7 +18,7 @@ public class RestaurantRequestDto {
     @NotNull(message = "Direccion es obligatorio")
     private String address;
     @NotNull(message = "Identificador del propietario es obligatorio")
-    private String ownerId;
+    private Long ownerId;
     @NotNull(message = "Numero de telefono es obligatorio")
     @Pattern(regexp = "[+]?\\d+(\\d+)?", message = "Ingrese un formato valido para el telefono")
     @Size(max = 13, message = "El telefono del restaurante debe tener un maximo de 13 caracteres")

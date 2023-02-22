@@ -76,7 +76,6 @@ public class UserHandler implements IUserHandler {
         var user = userServicePort.findUserByEmail(authenticationRequestDto.getEmail()).orElseThrow();
         var jwtToken = jwtHandler.generateToken(user);
 
-        //Date expirationTokenDate = jwtHandler.extractExpiration(jwtToken);
         UserEntity userEntity = (UserEntity) authentication.getPrincipal();
         JwtResponseDto jwtResponseDto = new JwtResponseDto();
         jwtResponseDto.setToken(jwtToken);
