@@ -3,6 +3,7 @@ package com.example.usuarios.application.mapper.request;
 import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
+import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

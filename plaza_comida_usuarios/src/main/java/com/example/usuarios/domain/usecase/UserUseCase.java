@@ -18,7 +18,7 @@ public class UserUseCase implements IUserServicePort {
 
 
     @Override
-    public AuthenticationResponseDto saveUser(UserModel userModel) {
+    public UserModel saveUser(UserModel userModel) {
         return userPersistencePort.saveUser(userModel);
     }
 

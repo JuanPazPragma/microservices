@@ -5,6 +5,7 @@ import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.dto.response.ResponseClientDto;
+import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
@@ -31,8 +32,10 @@ public class UserRestController {
 
     private final IUserHandler userHandler;
 
+    /*
     @PostMapping("/")
     public ResponseEntity<HashMap> saveUser(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
+
 
         if (bindingResult.hasErrors()) {
             return ValidationErrors(bindingResult);
@@ -41,10 +44,30 @@ public class UserRestController {
         userHandler.saveUser(userRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+     */
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.ok(userHandler.register(userRequestDto));
+    public ResponseEntity<ResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
+        ResponseDto responseDto = new ResponseDto();
+
+        if (bindingResult.hasErrors()) {
+            return ValidationErrors(bindingResult, responseDto);
+        }
+
+        try {
+            UserResponseDto userResponseDto = userHandler.register(userRequestDto);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(userResponseDto);
+
+        } catch (Exception exception) {
+            responseDto.setError(true);
+            responseDto.setMessage(exception.getMessage());
+            responseDto.setData(null);
+        }
+
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/authenticate")
@@ -77,12 +100,13 @@ public class UserRestController {
         return ResponseEntity.ok(responseDto);
     }
 
-    private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {
+    private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {
         List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 
-        HashMap<String, Object> message = new HashMap<String, Object>();
-        message.put("Error en el formulario", true);
-        message.put("Errores", errors);
-        return ResponseEntity.badRequest().body(message);
+        responseDto.setError(true);
+        responseDto.setMessage("Error en las validaciones");
+        responseDto.setData(errors);
+
+        return ResponseEntity.badRequest().body(responseDto);
     }
 }

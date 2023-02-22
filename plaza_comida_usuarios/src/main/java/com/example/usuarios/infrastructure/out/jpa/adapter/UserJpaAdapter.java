@@ -24,15 +24,13 @@ public class UserJpaAdapter implements IUserPersistencePort {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public AuthenticationResponseDto saveUser(UserModel userModel) {
+    public UserModel saveUser(UserModel userModel) {
         UserEntity userEntity = userEntityMapper.toEntity(userModel);
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
 
-        userRepository.save(userEntity);
+        UserEntity user = userRepository.save(userEntity);
 
-        var jwtToken = jwtHandler.generateToken(userEntity);
-
-        return AuthenticationResponseDto.builder().token(jwtToken).build();
+        return userEntityMapper.toUserModel(user);
     }
 
     @Override

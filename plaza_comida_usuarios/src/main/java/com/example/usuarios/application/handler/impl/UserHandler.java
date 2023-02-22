@@ -8,25 +8,24 @@ import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.application.handler.IUserHandler;
+import com.example.usuarios.application.mapper.request.IRolRequestMapper;
 import com.example.usuarios.application.mapper.request.IUserRequestMapper;
+import com.example.usuarios.application.mapper.response.IRolResponseMapper;
+import com.example.usuarios.application.mapper.response.IUserResponseMapper;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import com.example.usuarios.infrastructure.exception.NotEnoughPrivileges;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -36,8 +35,10 @@ public class UserHandler implements IUserHandler {
 
     private final IUserServicePort userServicePort;
     private final IUserRequestMapper userRequestMapper;
+    private final IUserResponseMapper userResponseMapper;
     private final IJwtHandler jwtHandler;
     private final AuthenticationManager authenticationManager;
+    private final IRolResponseMapper rolResponseMapper;
 
 
     @Override
@@ -52,14 +53,16 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
-    public AuthenticationResponseDto register(UserRequestDto userRequestDto) {
+    public UserResponseDto register(UserRequestDto userRequestDto) {
         RolModel rolModel = new RolModel();
         rolModel.setId(userRequestDto.getRolId());
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userModel.setRolId(rolModel);
 
-        return userServicePort.saveUser(userModel);
+        //userResponseMapper.toResponse(userModel, rolResponseMapper.toResponse(rolModel));
+
+        return userRequestMapper.toDto(userServicePort.saveUser(userModel));
     }
 
     @Override
@@ -100,7 +103,7 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
-    public AuthenticationResponseDto ownerRegister(RegisterRequestDto registerRequestDto, String token) {
+    public UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto, String token) {
 
         String email = jwtHandler.extractUserName(token);
 
@@ -127,11 +130,11 @@ public class UserHandler implements IUserHandler {
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userModel.setRolId(rolModel);
 
-        return userServicePort.saveUser(userModel);
+        return userRequestMapper.toDto(userServicePort.saveUser(userModel));
     }
 
     @Override
-    public AuthenticationResponseDto employeeRegister(RegisterRequestDto registerRequestDto, String token) {
+    public UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto, String token) {
         String email = jwtHandler.extractUserName(token);
 
 
@@ -157,7 +160,7 @@ public class UserHandler implements IUserHandler {
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userModel.setRolId(rolModel);
 
-        return userServicePort.saveUser(userModel);
+        return userRequestMapper.toDto(userServicePort.saveUser(userModel));
     }
 
 }

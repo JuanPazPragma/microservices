@@ -4,6 +4,8 @@ import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
+import com.example.usuarios.application.dto.response.ResponseDto;
+import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +28,19 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("/owner")
-    public ResponseEntity<AuthenticationResponseDto> ownerRegister(@RequestBody RegisterRequestDto registerRequestDto,
-                                                                   @RequestHeader(name = "Authorization") String token) {
-        return ResponseEntity.ok(userHandler.ownerRegister(registerRequestDto, extractToken(token)));
+    public ResponseEntity<ResponseDto> ownerRegister(@RequestBody RegisterRequestDto registerRequestDto,
+                                                     @RequestHeader(name = "Authorization") String token) {
+        ResponseDto responseDto = new ResponseDto();
+        UserResponseDto userResponseDto = userHandler.ownerRegister(registerRequestDto, extractToken(token));
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/employee")
-    public ResponseEntity<AuthenticationResponseDto> employeeRegister(@RequestBody RegisterRequestDto registerRequestDto,
-                                                                      @RequestHeader(name = "Authorization") String token) {
-        return ResponseEntity.ok(userHandler.employeeRegister(registerRequestDto, extractToken(token)));
+    public ResponseEntity<ResponseDto> employeeRegister(@RequestBody RegisterRequestDto registerRequestDto,
+                                                        @RequestHeader(name = "Authorization") String token) {
+        ResponseDto responseDto = new ResponseDto();
+        UserResponseDto userResponseDto = userHandler.employeeRegister(registerRequestDto, extractToken(token));
+        return ResponseEntity.ok(responseDto);
     }
 
 
