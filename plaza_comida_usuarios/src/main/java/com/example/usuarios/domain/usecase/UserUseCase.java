@@ -26,4 +26,9 @@ public class UserUseCase implements IUserServicePort {
     public Optional<UserEntity> findUserByEmail(String email) {
         return userPersistencePort.findUserByEmail(email);
     }
+
+    @Override
+    public UserModel getById(Long userId) {
+        return userPersistencePort.getById(userId);
+    }
 }

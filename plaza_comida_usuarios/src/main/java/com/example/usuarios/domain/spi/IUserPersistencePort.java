@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface IUserPersistencePort {
     AuthenticationResponseDto saveUser(UserModel userModel);
     Optional<UserEntity> findUserByEmail(String email);
+    UserModel getById(Long userId);
 }

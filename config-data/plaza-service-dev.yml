@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: users-service
+    name: plaza-service
   datasource:
     url: jdbc:mysql://localhost:3306/reto
     username: root

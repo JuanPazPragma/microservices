@@ -4,11 +4,16 @@ import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
+import com.example.usuarios.application.dto.response.ResponseClientDto;
+import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
+import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +55,26 @@ public class UserRestController {
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> login(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
         return ResponseEntity.ok(userHandler.login(authenticationRequestDto));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseClientDto> getUserById(@PathVariable Long id) {
+        ResponseClientDto responseDto = new ResponseClientDto();
+        try {
+            UserResponseDto userResponseDto = userHandler.getById(id);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(userHandler.getById(id));
+        } catch (NoDataFoundException ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Usuario No encontrado");
+            responseDto.setData(null);
+        } catch (Exception e) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno en el servidor");
+            responseDto.setData(null);
+        }
+        return ResponseEntity.ok(responseDto);
     }
 
     private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {

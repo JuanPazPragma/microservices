@@ -4,6 +4,7 @@ import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
+import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.application.mapper.request.IUserRequestMapper;
@@ -83,5 +84,10 @@ public class UserHandler implements IUserHandler {
         jwtResponseDto.setUserName(userEntity.getName());
         jwtResponseDto.setAuthorities(userEntity.getAuthorities());
         return jwtResponseDto;
+    }
+
+    @Override
+    public UserResponseDto getById(Long userId) {
+        return userRequestMapper.toDto(userServicePort.getById(userId));
     }
 }
