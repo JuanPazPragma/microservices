@@ -14,6 +14,7 @@ import com.example.usuarios.domain.api.IRolServicePort;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
+import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,11 @@ public class UserHandler implements IUserHandler {
 
     @Override
     public UserResponseDto register(UserRequestDto userRequestDto) {
+
+        if (userServicePort.findUserByEmail(userRequestDto.getEmail()).isPresent()) {
+            throw new EmailAlreadyTaken();
+        }
+
         RolModel rolModel = rolServicePort.getRol(userRequestDto.getRolId());
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);

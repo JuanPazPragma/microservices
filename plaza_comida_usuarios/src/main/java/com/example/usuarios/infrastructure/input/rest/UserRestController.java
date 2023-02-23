@@ -8,6 +8,7 @@ import com.example.usuarios.application.dto.response.ResponseClientDto;
 import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
+import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,20 +46,19 @@ public class UserRestController {
             responseDto.setError(false);
             responseDto.setMessage(null);
             responseDto.setData(userResponseDto);
-
+        } catch (EmailAlreadyTaken exception) {
+            responseDto.setError(true);
+            responseDto.setMessage("El email ingresado ya está en uso");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
         } catch (Exception exception) {
             responseDto.setError(true);
-            responseDto.setMessage(exception.getMessage());
+            responseDto.setMessage("Error interno del servidor");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-
-        return ResponseEntity.ok(responseDto);
-    }
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
-        return ResponseEntity.ok(userHandler.authenticate(authenticationRequestDto));
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/login")
