@@ -5,6 +5,7 @@ import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.dto.response.ResponseClientDto;
+import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
@@ -31,20 +32,28 @@ public class UserRestController {
 
     private final IUserHandler userHandler;
 
-    @PostMapping("/")
-    public ResponseEntity<HashMap> saveUser(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
+    @PostMapping("/register")
+    public ResponseEntity<ResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
+        ResponseDto responseDto = new ResponseDto();
 
         if (bindingResult.hasErrors()) {
-            return ValidationErrors(bindingResult);
+            return ValidationErrors(bindingResult, responseDto);
         }
 
-        userHandler.saveUser(userRequestDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
+        try {
+            UserResponseDto userResponseDto = userHandler.register(userRequestDto);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(userResponseDto);
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.ok(userHandler.register(userRequestDto));
+        } catch (Exception exception) {
+            responseDto.setError(true);
+            responseDto.setMessage(exception.getMessage());
+            responseDto.setData(null);
+        }
+
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/authenticate")
@@ -61,7 +70,7 @@ public class UserRestController {
     public ResponseEntity<ResponseClientDto> getUserById(@PathVariable Long id) {
         ResponseClientDto responseDto = new ResponseClientDto();
         try {
-            UserResponseDto userResponseDto = userHandler.getById(id);
+            userHandler.getById(id);
             responseDto.setError(false);
             responseDto.setMessage(null);
             responseDto.setData(userHandler.getById(id));
@@ -69,20 +78,24 @@ public class UserRestController {
             responseDto.setError(true);
             responseDto.setMessage("Usuario No encontrado");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             responseDto.setError(true);
             responseDto.setMessage("Error interno en el servidor");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return ResponseEntity.ok(responseDto);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-    private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {
+    private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {
         List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 
-        HashMap<String, Object> message = new HashMap<String, Object>();
-        message.put("Error en el formulario", true);
-        message.put("Errores", errors);
-        return ResponseEntity.badRequest().body(message);
+        responseDto.setError(true);
+        responseDto.setMessage("Error en las validaciones");
+        responseDto.setData(errors);
+
+        return ResponseEntity.badRequest().body(responseDto);
     }
 }

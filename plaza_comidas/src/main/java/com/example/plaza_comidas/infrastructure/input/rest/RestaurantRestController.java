@@ -52,7 +52,11 @@ public class RestaurantRestController {
 
         try {
             RestaurantResponseDto restaurantResponseDto = restaurantHandler.saveRestaurant(restaurantRequestDto);
-            if (restaurantResponseDto != null) {
+            if (restaurantResponseDto == null) {
+                responseDto.setError(true);
+                responseDto.setMessage("El usuario debe ser propietario");
+                responseDto.setData(null);
+            } else {
                 responseDto.setError(false);
                 responseDto.setMessage(null);
                 responseDto.setData(restaurantResponseDto);
@@ -64,7 +68,6 @@ public class RestaurantRestController {
         }
 
         return ResponseEntity.ok(responseDto);
-        //return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/")
