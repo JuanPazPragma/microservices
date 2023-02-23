@@ -3,20 +3,18 @@ package com.example.usuarios.application.handler.impl;
 import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
-import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.application.handler.IUserHandler;
-import com.example.usuarios.application.mapper.request.IRolRequestMapper;
 import com.example.usuarios.application.mapper.request.IUserRequestMapper;
 import com.example.usuarios.application.mapper.response.IRolResponseMapper;
 import com.example.usuarios.application.mapper.response.IUserResponseMapper;
+import com.example.usuarios.domain.api.IRolServicePort;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
-import com.example.usuarios.infrastructure.exception.NotEnoughPrivileges;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,41 +37,17 @@ public class UserHandler implements IUserHandler {
     private final IJwtHandler jwtHandler;
     private final AuthenticationManager authenticationManager;
     private final IRolResponseMapper rolResponseMapper;
+    private final IRolServicePort rolServicePort;
 
-
-    @Override
-    public void saveUser(UserRequestDto userRequestDto) {
-        RolModel rolModel = new RolModel();
-        rolModel.setId(userRequestDto.getRolId());
-
-        UserModel userModel = userRequestMapper.toUser(userRequestDto);
-        userModel.setRolId(rolModel);
-
-        userServicePort.saveUser(userModel);
-    }
 
     @Override
     public UserResponseDto register(UserRequestDto userRequestDto) {
-        RolModel rolModel = new RolModel();
-        rolModel.setId(userRequestDto.getRolId());
+        RolModel rolModel = rolServicePort.getRol(userRequestDto.getRolId());
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
         userModel.setRolId(rolModel);
 
-        return userResponseMapper.toResponse(userModel, rolResponseMapper.toResponse(rolModel));
-
-        //return userRequestMapper.toDto(userServicePort.saveUser(userModel));
-    }
-
-    @Override
-    public AuthenticationResponseDto authenticate(AuthenticationRequestDto authenticationRequestDto) {
-        UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(authenticationRequestDto.getEmail(), authenticationRequestDto.getPassword());
-
-        authenticationManager.authenticate(credentials);
-
-        var user = userServicePort.findUserByEmail(authenticationRequestDto.getEmail()).orElseThrow();
-        var jwtToken = jwtHandler.generateToken(user);
-        return AuthenticationResponseDto.builder().token(jwtToken).build();
+        return userResponseMapper.toResponse(userServicePort.saveUser(userModel), rolResponseMapper.toResponse(rolModel));
     }
 
     @Override
@@ -99,7 +73,8 @@ public class UserHandler implements IUserHandler {
 
     @Override
     public UserResponseDto getById(Long userId) {
-        return userRequestMapper.toDto(userServicePort.getById(userId));
+        UserModel userModel = userServicePort.getById(userId);
+        return userRequestMapper.toDto(userModel);
     }
 
     @Override
@@ -107,18 +82,10 @@ public class UserHandler implements IUserHandler {
 
         String email = jwtHandler.extractUserName(token);
 
-
         Optional<UserEntity> userEntity = userServicePort.findUserByEmail(email);
 
         if (userEntity.isEmpty()) {
             throw new NoDataFoundException();
-        }
-
-        Long rolId = userEntity.get().getRolId().getId();
-
-        //Id Administrador = 1
-        if (rolId != 1L) {
-            throw new NotEnoughPrivileges();
         }
 
         //Id propietario = 2
@@ -142,13 +109,6 @@ public class UserHandler implements IUserHandler {
 
         if (userEntity.isEmpty()) {
             throw new NoDataFoundException();
-        }
-
-        Long rolId = userEntity.get().getRolId().getId();
-
-        //Id propietario = 2
-        if (rolId != 2L) {
-            throw new NotEnoughPrivileges();
         }
 
         //Id empleado = 3

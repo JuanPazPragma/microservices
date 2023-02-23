@@ -11,6 +11,5 @@ public class UserResponseDto {
     private String idNumber;
     private String phone;
     private String email;
-    private String password;
     private RolResponseDto rolId;
 }

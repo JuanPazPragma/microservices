@@ -13,6 +13,7 @@ import org.mapstruct.ReportingPolicy;
 public interface IUserResponseMapper {
 
     @Mapping(target = "rolId.name", source = "rolResponseDto.name")
+    @Mapping(target = "rolId.description", source = "rolResponseDto.description")
     @Mapping(target = "name", source = "userModel.name")
     UserResponseDto toResponse(UserModel userModel, RolResponseDto rolResponseDto);
 }

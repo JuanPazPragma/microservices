@@ -32,20 +32,6 @@ public class UserRestController {
 
     private final IUserHandler userHandler;
 
-    /*
-    @PostMapping("/")
-    public ResponseEntity<HashMap> saveUser(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
-
-
-        if (bindingResult.hasErrors()) {
-            return ValidationErrors(bindingResult);
-        }
-
-        userHandler.saveUser(userRequestDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-     */
-
     @PostMapping("/register")
     public ResponseEntity<ResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
         ResponseDto responseDto = new ResponseDto();
@@ -84,7 +70,7 @@ public class UserRestController {
     public ResponseEntity<ResponseClientDto> getUserById(@PathVariable Long id) {
         ResponseClientDto responseDto = new ResponseClientDto();
         try {
-            UserResponseDto userResponseDto = userHandler.getById(id);
+            userHandler.getById(id);
             responseDto.setError(false);
             responseDto.setMessage(null);
             responseDto.setData(userHandler.getById(id));
@@ -92,12 +78,15 @@ public class UserRestController {
             responseDto.setError(true);
             responseDto.setMessage("Usuario No encontrado");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             responseDto.setError(true);
             responseDto.setMessage("Error interno en el servidor");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return ResponseEntity.ok(responseDto);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {

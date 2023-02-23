@@ -4,6 +4,7 @@ import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
+import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IRolEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IUserEntityMapper;
@@ -40,7 +41,7 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     @Override
     public UserModel getById(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow();
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(NoDataFoundException::new);
         return userEntityMapper.toUserModel(userEntity);
     }
 
