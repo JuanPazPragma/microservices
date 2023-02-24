@@ -14,9 +14,9 @@ public interface IUserHandler {
     UserResponseDto getById(Long userId);
     UserResponseDto getByEmail(String email);
 
-    UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto, String token);
+    UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto);
 
-    UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto, String token);
+    UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto);
 
     UserResponseDto clientRegister(RegisterRequestDto registerRequestDto);
 }

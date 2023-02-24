@@ -50,7 +50,7 @@ public class FactoryDishDataTest {
         restaurantModel.setId(1l);
         restaurantModel.setName("Corral");
         restaurantModel.setAddress("Calle 5");
-        restaurantModel.setOwnerId("4");
+        restaurantModel.setOwnerId(4L);
         restaurantModel.setPhoneNumber("+10000");
         restaurantModel.setUrlLogo("logoUrl");
         restaurantModel.setNit("20000");

@@ -8,7 +8,7 @@ import lombok.Setter;
 public class RestaurantResponseDto {
     private String name;
     private String address;
-    private String ownerId;
+    private Long ownerId;
     private String phoneNumber;
     private String urlLogo;
     private String nit;

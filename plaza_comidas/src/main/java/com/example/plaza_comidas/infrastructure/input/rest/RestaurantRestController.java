@@ -4,11 +4,13 @@ import com.example.plaza_comidas.application.dto.request.RestaurantRequestDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IRestaurantHandler;
+import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,38 +39,36 @@ public class RestaurantRestController {
     })
     @RolesAllowed({"ROLE_ADMINISTRADOR"})
     @PostMapping("/")
-    public ResponseEntity<ResponseDto> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto, BindingResult bindingResult) {
+    public ResponseEntity<ResponseDto> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto,
+
+                                                      BindingResult bindingResult) {
 
         ResponseDto responseDto = new ResponseDto();
 
         if (bindingResult.hasErrors()) {
-            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
-
-            responseDto.setError(true);
-            responseDto.setMessage("Error en las validaciones");
-            responseDto.setData(errors);
-
-            return ResponseEntity.badRequest().body(responseDto);
+            return ValidationErrors(bindingResult, responseDto);
         }
 
         try {
             RestaurantResponseDto restaurantResponseDto = restaurantHandler.saveRestaurant(restaurantRequestDto);
-            if (restaurantResponseDto == null) {
-                responseDto.setError(true);
-                responseDto.setMessage("El usuario debe ser propietario");
-                responseDto.setData(null);
-            } else {
-                responseDto.setError(false);
-                responseDto.setMessage(null);
-                responseDto.setData(restaurantResponseDto);
-            }
+
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(restaurantResponseDto);
+
+        } catch (NotEnoughPrivileges ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("el usuario debe ser propietario");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             responseDto.setError(true);
-            responseDto.setMessage(ex.getMessage());
+            responseDto.setMessage("No se encontraron datos de usuario");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok(responseDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @GetMapping("/")
@@ -76,13 +76,14 @@ public class RestaurantRestController {
         return ResponseEntity.ok(restaurantHandler.getAllRestaurants());
     }
 
-    private ResponseEntity<HashMap> ValidationErrors(BindingResult bindingResult) {
+    private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {
         List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 
-        HashMap<String, Object> message = new HashMap<String, Object>();
-        message.put("Error en el formulario", true);
-        message.put("Errores", errors);
-        return ResponseEntity.badRequest().body(message);
+        responseDto.setError(true);
+        responseDto.setMessage("Error en las validaciones");
+        responseDto.setData(errors);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
     }
 
 }

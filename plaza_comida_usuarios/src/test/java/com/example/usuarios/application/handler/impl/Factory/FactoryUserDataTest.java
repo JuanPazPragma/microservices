@@ -1,5 +1,6 @@
 package com.example.usuarios.application.handler.impl.Factory;
 
+import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.RolResponseDto;
@@ -11,7 +12,7 @@ import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 
 public class FactoryUserDataTest {
 
-    public static UserRequestDto getUserRequestDto() {
+    public static UserRequestDto getUserRequestDto(Long rolId) {
         UserRequestDto userRequestDto = new UserRequestDto();
 
         userRequestDto.setName("Juan");
@@ -20,7 +21,7 @@ public class FactoryUserDataTest {
         userRequestDto.setPhone("54450");
         userRequestDto.setEmail("juan@gmail.com");
         userRequestDto.setPassword("1234");
-        userRequestDto.setRolId(1L);
+        userRequestDto.setRolId(rolId);
 
         return userRequestDto;
     }
@@ -38,7 +39,7 @@ public class FactoryUserDataTest {
         return userResponseDto;
     }
 
-    public static UserModel getUserModel() {
+    public static UserModel getUserModel(Long rolId, String rolName) {
         UserModel userModel = new UserModel();
 
         userModel.setId(1L);
@@ -48,7 +49,7 @@ public class FactoryUserDataTest {
         userModel.setPhone("54450");
         userModel.setEmail("juan@gmail.com");
         userModel.setPassword("1234");
-        userModel.setRolId(getRolModel());
+        userModel.setRolId(getRolModel(rolId,rolName));
 
         return userModel;
     }
@@ -68,12 +69,12 @@ public class FactoryUserDataTest {
         return userEntity;
     }
 
-    public static RolModel getRolModel() {
+    public static RolModel getRolModel(Long rolId, String roleName) {
         RolModel rolModel = new RolModel();
 
-        rolModel.setId(1L);
-        rolModel.setName("ROLE_ADMINISTRADOR");
-        rolModel.setDescription("Administrador");
+        rolModel.setId(rolId);
+        rolModel.setName(roleName);
+        rolModel.setDescription("descripcion");
 
         return rolModel;
     }
@@ -105,6 +106,19 @@ public class FactoryUserDataTest {
         responseDto.setMessage(message);
 
         return responseDto;
+    }
+
+    public static RegisterRequestDto getRegisterRequestDto(){
+        RegisterRequestDto registerRequestDto = new RegisterRequestDto();
+
+        registerRequestDto.setName("Juan");
+        registerRequestDto.setLastName("Paz");
+        registerRequestDto.setIdNumber("100");
+        registerRequestDto.setPhone("54450");
+        registerRequestDto.setEmail("juan@gmail.com");
+        registerRequestDto.setPassword("1234");
+
+        return registerRequestDto;
     }
 
 

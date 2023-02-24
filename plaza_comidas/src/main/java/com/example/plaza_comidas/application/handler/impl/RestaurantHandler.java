@@ -8,7 +8,7 @@ import com.example.plaza_comidas.application.mapper.request.IRestaurantRequestMa
 import com.example.plaza_comidas.application.mapper.response.IRestaurantResponseMapper;
 import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
-import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
+import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,12 +30,14 @@ public class RestaurantHandler implements IRestaurantHandler {
     @Override
     public RestaurantResponseDto saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
         RestaurantModel restaurantModel = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
-        UserRequestDto user = userClient.getUserById(restaurantModel.getOwnerId()).getBody().getData();
+        UserRequestDto userRequestDto = userClient.getUserById(restaurantModel.getOwnerId()).getBody().getData();
 
-        if (user == null) {
-            throw new NoDataFoundException();
+        /*
+        if (userRequestDto.getRolId().getName().equalsIgnoreCase("ROLE_PROPIETARIO")) {
+            throw new NotEnoughPrivileges();
         }
-
+*/
+        restaurantModel.setOwnerId(userRequestDto.getId());
         RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
         return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurant.getId()));
     }

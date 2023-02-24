@@ -15,7 +15,6 @@ import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
-import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -91,50 +89,35 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
-    public UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto, String token) {
+    public UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto) {
 
-        String email = jwtHandler.extractUserName(token);
-
-        Optional<UserEntity> userEntity = userServicePort.findUserByEmail(email);
-
-        if (userEntity.isEmpty()) {
-            throw new NoDataFoundException();
+        if (userServicePort.findUserByEmail(registerRequestDto.getEmail()).isPresent()) {
+            throw new EmailAlreadyTaken();
         }
-
-        //Id propietario = 2
-        RolModel rolModel = new RolModel();
-        rolModel.setId(2L);
 
         UserRequestDto userRequestDto = userRequestMapper.toUserRequestDto(registerRequestDto);
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
+        RolModel rolModel = rolServicePort.getRol(2L);
         userModel.setRolId(rolModel);
 
-        return userRequestMapper.toDto(userServicePort.saveUser(userModel));
+        return userResponseMapper.toResponse(userServicePort.saveUser(userModel), rolResponseMapper.toResponse(rolModel));
     }
 
     @Override
-    public UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto, String token) {
+    public UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto) {
 
-        String email = jwtHandler.extractUserName(token);
-
-
-        Optional<UserEntity> userEntity = userServicePort.findUserByEmail(email);
-
-        if (userEntity.isEmpty()) {
-            throw new NoDataFoundException();
+        if (userServicePort.findUserByEmail(registerRequestDto.getEmail()).isPresent()) {
+            throw new EmailAlreadyTaken();
         }
-
-        //Id empleado = 3
-        RolModel rolModel = new RolModel();
-        rolModel.setId(3L);
 
         UserRequestDto userRequestDto = userRequestMapper.toUserRequestDto(registerRequestDto);
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
+        RolModel rolModel = rolServicePort.getRol(3L);
         userModel.setRolId(rolModel);
 
-        return userRequestMapper.toDto(userServicePort.saveUser(userModel));
+        return userResponseMapper.toResponse(userServicePort.saveUser(userModel), rolResponseMapper.toResponse(rolModel));
     }
 
     @Override
@@ -144,12 +127,10 @@ public class UserHandler implements IUserHandler {
             throw new EmailAlreadyTaken();
         }
 
-        //Id usuario = 4
-        RolModel rolModel = rolServicePort.getRol(4L);
-
         UserRequestDto userRequestDto = userRequestMapper.toUserRequestDto(registerRequestDto);
 
         UserModel userModel = userRequestMapper.toUser(userRequestDto);
+        RolModel rolModel = rolServicePort.getRol(4L);
         userModel.setRolId(rolModel);
 
         return userResponseMapper.toResponse(userServicePort.saveUser(userModel), rolResponseMapper.toResponse(rolModel));
