@@ -11,4 +11,6 @@ public interface IUserClient {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseClientDto> getUserById(@PathVariable Long id);
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ResponseClientDto> getUserByEmail(@PathVariable String email);
 }
