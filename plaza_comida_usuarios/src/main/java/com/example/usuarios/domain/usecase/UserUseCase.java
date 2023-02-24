@@ -28,6 +28,11 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
+    public UserModel findUserByEmailModel(String email) {
+        return userPersistencePort.findUserByEmailModel(email);
+    }
+
+    @Override
     public UserModel getById(Long userId) {
         return userPersistencePort.getById(userId);
     }

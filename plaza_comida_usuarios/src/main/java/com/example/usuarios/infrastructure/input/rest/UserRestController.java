@@ -1,6 +1,7 @@
 package com.example.usuarios.infrastructure.input.rest;
 
 import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
+import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
@@ -8,6 +9,7 @@ import com.example.usuarios.application.dto.response.ResponseClientDto;
 import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
+import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,20 +47,19 @@ public class UserRestController {
             responseDto.setError(false);
             responseDto.setMessage(null);
             responseDto.setData(userResponseDto);
-
+        } catch (EmailAlreadyTaken exception) {
+            responseDto.setError(true);
+            responseDto.setMessage("El email ingresado ya está en uso");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
         } catch (Exception exception) {
             responseDto.setError(true);
-            responseDto.setMessage(exception.getMessage());
+            responseDto.setMessage("Error interno del servidor");
             responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-
-        return ResponseEntity.ok(responseDto);
-    }
-
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponseDto> authenticate(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
-        return ResponseEntity.ok(userHandler.authenticate(authenticationRequestDto));
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/login")
@@ -89,6 +90,57 @@ public class UserRestController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ResponseClientDto> getUserByEmail(@PathVariable String email) {
+        ResponseClientDto responseDto = new ResponseClientDto();
+        try {
+            userHandler.getByEmail(email);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(userHandler.getByEmail(email));
+        } catch (NoDataFoundException ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Usuario No encontrado");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno en el servidor");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/client")
+    public ResponseEntity<ResponseDto> clientRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto, BindingResult bindingResult) {
+        ResponseDto responseDto = new ResponseDto();
+
+        if (bindingResult.hasErrors()) {
+            return ValidationErrors(bindingResult, responseDto);
+        }
+
+        try {
+            UserResponseDto userResponseDto = userHandler.clientRegister(registerRequestDto);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(userResponseDto);
+        } catch (EmailAlreadyTaken exception) {
+            responseDto.setError(true);
+            responseDto.setMessage("El email ingresado ya está en uso");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
+        } catch (Exception exception) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno del servidor");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
     private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {
         List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
 
@@ -96,6 +148,6 @@ public class UserRestController {
         responseDto.setMessage("Error en las validaciones");
         responseDto.setData(errors);
 
-        return ResponseEntity.badRequest().body(responseDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
     }
 }

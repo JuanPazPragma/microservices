@@ -1,12 +1,9 @@
 package com.example.usuarios.infrastructure.out.jpa.adapter;
 
-import com.example.usuarios.application.dto.response.AuthenticationResponseDto;
-import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.domain.spi.IUserPersistencePort;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
-import com.example.usuarios.infrastructure.out.jpa.mapper.IRolEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.mapper.IUserEntityMapper;
 import com.example.usuarios.infrastructure.out.jpa.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +17,6 @@ public class UserJpaAdapter implements IUserPersistencePort {
 
     private final IUserRepository userRepository;
     private final IUserEntityMapper userEntityMapper;
-    private final IJwtHandler jwtHandler;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -37,6 +33,14 @@ public class UserJpaAdapter implements IUserPersistencePort {
     @Override
     public Optional<UserEntity> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public UserModel findUserByEmailModel(String email) {
+        Optional<UserEntity> userEntityOptional = userRepository.findByEmail(email);
+        UserEntity userEntity = userEntityOptional.get();
+        UserModel userModel = userEntityMapper.toUserModel(userEntity);
+        return userModel;
     }
 
     @Override
