@@ -1,6 +1,5 @@
 package com.example.usuarios.infrastructure.configuration;
 
-import com.example.usuarios.application.handler.IJwtHandler;
 import com.example.usuarios.domain.api.IRolServicePort;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.spi.IRolPersistencePort;
@@ -32,7 +31,6 @@ public class BeanConfiguration {
     private final IUserEntityMapper userEntityMapper;
     private final IRolRepository rolRepository;
     private final IRolEntityMapper rolEntityMapper;
-    private final IJwtHandler jwtHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,7 +39,7 @@ public class BeanConfiguration {
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
-        return new UserJpaAdapter(userRepository, userEntityMapper, jwtHandler);
+        return new UserJpaAdapter(userRepository, userEntityMapper);
     }
 
     @Bean

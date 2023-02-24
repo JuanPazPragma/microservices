@@ -84,6 +84,13 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
+    public UserResponseDto getByEmail(String email) {
+        UserModel userModel = userServicePort.findUserByEmailModel(email);
+
+        return userRequestMapper.toDto(userModel);
+    }
+
+    @Override
     public UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto, String token) {
 
         String email = jwtHandler.extractUserName(token);
@@ -108,6 +115,7 @@ public class UserHandler implements IUserHandler {
 
     @Override
     public UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto, String token) {
+
         String email = jwtHandler.extractUserName(token);
 
 
@@ -127,6 +135,24 @@ public class UserHandler implements IUserHandler {
         userModel.setRolId(rolModel);
 
         return userRequestMapper.toDto(userServicePort.saveUser(userModel));
+    }
+
+    @Override
+    public UserResponseDto clientRegister(RegisterRequestDto registerRequestDto) {
+
+        if (userServicePort.findUserByEmail(registerRequestDto.getEmail()).isPresent()) {
+            throw new EmailAlreadyTaken();
+        }
+
+        //Id usuario = 4
+        RolModel rolModel = rolServicePort.getRol(4L);
+
+        UserRequestDto userRequestDto = userRequestMapper.toUserRequestDto(registerRequestDto);
+
+        UserModel userModel = userRequestMapper.toUser(userRequestDto);
+        userModel.setRolId(rolModel);
+
+        return userResponseMapper.toResponse(userServicePort.saveUser(userModel), rolResponseMapper.toResponse(rolModel));
     }
 
 }
