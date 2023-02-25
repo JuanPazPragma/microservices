@@ -2,6 +2,7 @@ package com.example.plaza_comidas.application.handler.impl;
 
 import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
+import com.example.plaza_comidas.application.dto.request.UserRequestDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.handler.IDishHandler;
 import com.example.plaza_comidas.application.mapper.request.IDishRequestMapper;
@@ -14,11 +15,14 @@ import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
 import com.example.plaza_comidas.domain.model.CategoryModel;
 import com.example.plaza_comidas.domain.model.DishModel;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
+import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
+import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,20 +36,25 @@ public class DishHandler implements IDishHandler {
     private final IDishResponseMapper dishResponseMapper;
     private final ICategoryResponseMapper categoryResponseMapper;
     private final IRestaurantResponseMapper restaurantResponseMapper;
+    private final IUserClient userClient;
 
     @Override
-    public void saveDish(DishRequestDto dishRequestDto) {
-        CategoryModel categoryModel = new CategoryModel();
-        categoryModel.setId(dishRequestDto.getCategoryId());
+    public DishResponseDto saveDish(DishRequestDto dishRequestDto) {
+        RestaurantModel restaurantModel = restaurantServicePort.getRestaurant(dishRequestDto.getRestaurantId());
+        UserRequestDto userRequestDto = userClient.getUserById(restaurantModel.getOwnerId()).getBody().getData();
 
-        RestaurantModel restaurantModel = new RestaurantModel();
-        restaurantModel.setId(dishRequestDto.getRestaurantId());
+        if (!Objects.equals(restaurantModel.getOwnerId(), userRequestDto.getId())) {
+            throw new NotEnoughPrivileges();
+        }
 
+        CategoryModel categoryModel = categoryServicePort.getCategory(dishRequestDto.getCategoryId());
         DishModel dishModel = dishRequestMapper.toDish(dishRequestDto);
         dishModel.setCategoryId(categoryModel);
         dishModel.setRestaurantId(restaurantModel);
 
         dishServicePort.saveDish(dishModel);
+
+        return dishResponseMapper.toResponse(dishModel, categoryResponseMapper.toResponse(categoryModel), restaurantResponseMapper.toResponse(restaurantModel));
     }
 
     @Override

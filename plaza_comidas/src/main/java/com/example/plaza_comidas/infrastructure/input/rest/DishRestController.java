@@ -4,7 +4,11 @@ import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
+import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IDishHandler;
+import com.example.plaza_comidas.infrastructure.exception.CategoryNotFoundException;
+import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
+import com.example.plaza_comidas.infrastructure.exception.RestaurantNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +43,44 @@ public class DishRestController {
     })
     @RolesAllowed({"ROLE_PROPIETARIO"})
     @PostMapping("/")
-    public ResponseEntity<Void> saveDish(@RequestBody DishRequestDto dishRequestDto) {
-        dishHandler.saveDish(dishRequestDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> saveDish(@Valid @RequestBody DishRequestDto dishRequestDto,
+                                                BindingResult bindingResult) {
+        ResponseDto responseDto = new ResponseDto();
+
+        if (bindingResult.hasErrors()) {
+            return ValidationErrors(bindingResult, responseDto);
+        }
+
+        try {
+            DishResponseDto dishResponseDto = dishHandler.saveDish(dishRequestDto);
+
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(dishResponseDto);
+
+        } catch (CategoryNotFoundException ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("No se encontró la categoria");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
+        } catch (RestaurantNotFoundException ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("No se encontró el restaurante");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
+        } catch (NotEnoughPrivileges ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("No tienes suficientes privilegios para realizar esta accion");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.FORBIDDEN);
+        } catch (Exception ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno del servidor");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @GetMapping("/")

@@ -40,7 +40,6 @@ public class RestaurantRestController {
     @RolesAllowed({"ROLE_ADMINISTRADOR"})
     @PostMapping("/")
     public ResponseEntity<ResponseDto> saveRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto,
-
                                                       BindingResult bindingResult) {
 
         ResponseDto responseDto = new ResponseDto();

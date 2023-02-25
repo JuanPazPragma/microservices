@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IDishHandler {
 
-    void saveDish(DishRequestDto dishRequestDto);
+    DishResponseDto saveDish(DishRequestDto dishRequestDto);
 
     List<DishResponseDto> getAllDishes();
 

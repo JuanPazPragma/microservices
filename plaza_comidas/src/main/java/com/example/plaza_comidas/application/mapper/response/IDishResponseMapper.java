@@ -25,6 +25,11 @@ public interface IDishResponseMapper {
     @Mapping(target = "categoryId.name", source = "categoryResponseDto.name")
     @Mapping(target = "categoryId.description", source = "categoryResponseDto.description")
     @Mapping(target = "restaurantId.name", source = "restaurantResponseDto.name")
+    @Mapping(target = "restaurantId.address", source = "restaurantResponseDto.address")
+    @Mapping(target = "restaurantId.ownerId", source = "restaurantResponseDto.ownerId")
+    @Mapping(target = "restaurantId.phoneNumber", source = "restaurantResponseDto.phoneNumber")
+    @Mapping(target = "restaurantId.urlLogo", source = "restaurantResponseDto.urlLogo")
+    @Mapping(target = "restaurantId.nit", source = "restaurantResponseDto.nit")
     @Mapping(target = "name", source = "dishModel.name")
     @Mapping(target = "description", source = "dishModel.description")
     DishResponseDto toResponse(DishModel dishModel, CategoryResponseDto categoryResponseDto, RestaurantResponseDto restaurantResponseDto);

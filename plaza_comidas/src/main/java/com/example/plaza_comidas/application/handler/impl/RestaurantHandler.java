@@ -37,7 +37,7 @@ public class RestaurantHandler implements IRestaurantHandler {
             throw new NotEnoughPrivileges();
         }
 */
-        restaurantModel.setOwnerId(userRequestDto.getId());
+        restaurantModel.setOwnerId(restaurantRequestDto.getOwnerId());
         RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
         return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurant.getId()));
     }
