@@ -1,6 +1,8 @@
 package com.example.factory;
 
 import com.example.plaza_comidas.application.dto.request.DishRequestDto;
+import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
+import com.example.plaza_comidas.application.dto.request.UserRequestDto;
 import com.example.plaza_comidas.application.dto.response.CategoryResponseDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseClientDto;
@@ -21,6 +23,20 @@ public class FactoryDishDataTest {
         expectedDishModel.setName("Arroz");
         expectedDishModel.setCategoryId(getCategoryModel());
         expectedDishModel.setDescription("restaurante");
+        expectedDishModel.setPrice(200f);
+        expectedDishModel.setRestaurantId(getRestaurantModel());
+        expectedDishModel.setUrlImage("urlImage");
+        expectedDishModel.setActive(true);
+
+        return expectedDishModel;
+    }
+
+    public static DishModel getDishModel2() {
+        DishModel expectedDishModel = new DishModel();
+
+        expectedDishModel.setName("Arroz");
+        expectedDishModel.setCategoryId(getCategoryModel());
+        expectedDishModel.setDescription("restaurante2");
         expectedDishModel.setPrice(200f);
         expectedDishModel.setRestaurantId(getRestaurantModel());
         expectedDishModel.setUrlImage("urlImage");
@@ -59,6 +75,20 @@ public class FactoryDishDataTest {
         restaurantModel.setName("Corral");
         restaurantModel.setAddress("Calle 5");
         restaurantModel.setOwnerId(1L);
+        restaurantModel.setPhoneNumber("+10000");
+        restaurantModel.setUrlLogo("logoUrl");
+        restaurantModel.setNit("20000");
+
+        return restaurantModel;
+    }
+
+    public static RestaurantModel getRestaurantModel2() {
+        RestaurantModel restaurantModel = new RestaurantModel();
+
+        restaurantModel.setId(1L);
+        restaurantModel.setName("Corral");
+        restaurantModel.setAddress("Calle 5");
+        restaurantModel.setOwnerId(2L);
         restaurantModel.setPhoneNumber("+10000");
         restaurantModel.setUrlLogo("logoUrl");
         restaurantModel.setNit("20000");
@@ -113,6 +143,36 @@ public class FactoryDishDataTest {
         restaurantModel.setNit("20000");
 
         return restaurantModel;
+    }
+
+    public static DishUpdateRequestDto getDishUpdateRequest(){
+        DishUpdateRequestDto dishUpdateRequestDto = new DishUpdateRequestDto();
+
+        dishUpdateRequestDto.setId(1L);
+        dishUpdateRequestDto.setDescription("restaurante2");
+        dishUpdateRequestDto.setPrice(300f);
+
+        return dishUpdateRequestDto;
+    }
+
+    public static DishResponseDto getDishUpdateResponseDto() {
+        DishResponseDto dishResponseDto = new DishResponseDto();
+
+        dishResponseDto.setName("Arroz");
+        dishResponseDto.setCategoryId(getCategoryResponseDto());
+        dishResponseDto.setDescription("restaurante2");
+        dishResponseDto.setPrice(300f);
+        dishResponseDto.setRestaurantId(getRestaurantResponseDto());
+        dishResponseDto.setUrlImage("urlImage");
+        dishResponseDto.setActive(true);
+
+        return dishResponseDto;
+    }
+
+    public static UserRequestDto getUserRequestDto(){
+        UserRequestDto userRequestDto = new UserRequestDto();
+        userRequestDto.setId(3L);
+        return userRequestDto;
     }
 
 }

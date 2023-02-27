@@ -24,7 +24,7 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers()
+                .antMatchers("/api/v1/dish/alldishes")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

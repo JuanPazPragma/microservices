@@ -14,6 +14,6 @@ public interface IDishHandler {
 
     DishResponseDto getDish(Long dishId);
 
-    void updateDish(DishUpdateRequestDto dishUpdateRequestDto);
+    DishResponseDto updateDish(DishUpdateRequestDto dishUpdateRequestDto);
 
 }

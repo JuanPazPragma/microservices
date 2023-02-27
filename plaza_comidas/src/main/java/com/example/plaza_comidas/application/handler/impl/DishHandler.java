@@ -15,6 +15,8 @@ import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
 import com.example.plaza_comidas.domain.model.CategoryModel;
 import com.example.plaza_comidas.domain.model.DishModel;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
+import com.example.plaza_comidas.infrastructure.configuration.FeignClientInterceptorImp;
+import com.example.plaza_comidas.infrastructure.exception.NoUserFoundException;
 import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class DishHandler implements IDishHandler {
     private final ICategoryResponseMapper categoryResponseMapper;
     private final IRestaurantResponseMapper restaurantResponseMapper;
     private final IUserClient userClient;
+    private final JwtHandler jwtHandler;
 
     @Override
     public DishResponseDto saveDish(DishRequestDto dishRequestDto) {
@@ -70,10 +73,15 @@ public class DishHandler implements IDishHandler {
     }
 
     @Override
-    public void updateDish(DishUpdateRequestDto dishRequestDto) {
-        DishModel oldDish = dishServicePort.getDish(dishRequestDto.getId());
+    public DishResponseDto updateDish(DishUpdateRequestDto dishRequestDto) {
+        String tokenHeader = FeignClientInterceptorImp.getBearerTokenHeader();
+        String[] splited = tokenHeader.split("\\s+");
+        String email = jwtHandler.extractUserName(splited[1]);
+        UserRequestDto userRequestDto = userClient.getUserByEmail(email).getBody().getData();
 
         DishModel newDish = dishRequestMapper.toDish(dishRequestDto);
+        DishModel oldDish = dishServicePort.getDish(dishRequestDto.getId());
+
         newDish.setId(oldDish.getId());
         newDish.setName(oldDish.getName());
         newDish.setCategoryId(oldDish.getCategoryId());
@@ -81,9 +89,17 @@ public class DishHandler implements IDishHandler {
         newDish.setPrice(dishRequestDto.getPrice());
         newDish.setRestaurantId(oldDish.getRestaurantId());
         newDish.setUrlImage(oldDish.getUrlImage());
-        newDish.setActive(oldDish.getActive());
+        newDish.setActive(dishRequestDto.isActive());
+        RestaurantModel restaurantModel = restaurantServicePort.getRestaurant(newDish.getRestaurantId().getId());
+
+        if (!userRequestDto.getId().equals(restaurantModel.getOwnerId())) {
+            throw new NotEnoughPrivileges();
+        }
 
         dishServicePort.updateDish(newDish);
+        CategoryModel categoryModel = categoryServicePort.getCategory(newDish.getCategoryId().getId());
 
+
+        return dishResponseMapper.toResponse(newDish, categoryResponseMapper.toResponse(categoryModel), restaurantResponseMapper.toResponse(restaurantModel));
     }
 }

@@ -40,17 +40,16 @@ public interface IDishResponseMapper {
                     DishResponseDto dishResponseDto = new DishResponseDto();
 
                     dishResponseDto.setName(dish.getName());
-
                     dishResponseDto.setCategoryId(CATEGORY_RESPONSE_MAPPER_INSTANCE.toResponse(categoryModelList.stream().filter(
-                            category -> category.getId().equals(dish.getCategoryId())).findFirst().orElse(null)
-                    ));
+                            category -> category.getId().equals(dish.getCategoryId().getId())
+                    ).findFirst().get()));
 
                     dishResponseDto.setDescription(dish.getDescription());
                     dishResponseDto.setPrice(dish.getPrice());
 
                     dishResponseDto.setRestaurantId(RESTAURANT_RESPONSE_MAPPER_INSTANCE.toResponse(restaurantModelList.stream().filter(
-                            restaurant -> restaurant.getId().equals(dish.getRestaurantId())).findFirst().orElse(null)
-                    ));
+                            restaurant -> restaurant.getId().equals(dish.getRestaurantId().getId())
+                    ).findFirst().get()));
 
                     dishResponseDto.setUrlImage(dish.getUrlImage());
                     dishResponseDto.setActive(dish.getActive());

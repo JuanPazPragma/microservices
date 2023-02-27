@@ -4,7 +4,6 @@ import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
-import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IDishHandler;
 import com.example.plaza_comidas.infrastructure.exception.CategoryNotFoundException;
 import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
@@ -83,7 +82,7 @@ public class DishRestController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/")
+    @GetMapping("/alldishes")
     public ResponseEntity<List<DishResponseDto>> getAllDishes() {
         return ResponseEntity.ok(dishHandler.getAllDishes());
     }
@@ -93,10 +92,36 @@ public class DishRestController {
             @ApiResponse(responseCode = "200", description = "Dish updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content)
     })
+    @RolesAllowed({"ROLE_PROPIETARIO"})
     @PutMapping("/")
-    public ResponseEntity<Void> updateDish(@RequestBody DishUpdateRequestDto dishUpdateRequestDto) {
-        dishHandler.updateDish(dishUpdateRequestDto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ResponseDto> updateDish(@Valid @RequestBody DishUpdateRequestDto dishUpdateRequestDto,
+                                                  BindingResult bindingResult) {
+
+        ResponseDto responseDto = new ResponseDto();
+
+        if (bindingResult.hasErrors()) {
+            return ValidationErrors(bindingResult, responseDto);
+        }
+
+        try {
+            DishResponseDto dishResponseDto = dishHandler.updateDish(dishUpdateRequestDto);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(dishResponseDto);
+        } catch (NotEnoughPrivileges ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("No tienes suficientes privilegios para realizar esta accion");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.FORBIDDEN);
+        } catch (Exception ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno del servidor");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {
