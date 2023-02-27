@@ -4,6 +4,7 @@ import com.example.factory.FactoryDishDataTest;
 import com.example.factory.FactoryRestaurantDataTest;
 import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
+import com.example.plaza_comidas.application.dto.request.ListPaginationRequest;
 import com.example.plaza_comidas.application.dto.response.CategoryResponseDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseClientDto;
@@ -24,6 +25,7 @@ import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -31,7 +33,13 @@ import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -165,6 +173,33 @@ class DishHandlerTest {
             );
 
         }
+    }
+
+    @Test
+    void mustGetAllDishesByRestaurantId() {
+        List<DishModel> dishModelList = new ArrayList<>();
+        dishModelList.add(FactoryDishDataTest.getDishModle());
+
+        List<CategoryModel> categoryModelList = new ArrayList<>();
+        categoryModelList.add(FactoryDishDataTest.getCategoryModel());
+
+        List<RestaurantModel> restaurantModelList = new ArrayList<>();
+        restaurantModelList.add(FactoryDishDataTest.getRestaurantModel());
+
+        List<DishResponseDto> dishResponseDtos = new ArrayList<>();
+        dishResponseDtos.add(FactoryDishDataTest.getDishResponseDto());
+
+        ListPaginationRequest listPaginationRequest = new ListPaginationRequest();
+        listPaginationRequest.setPageN(0);
+        listPaginationRequest.setSize(20);
+
+        when(dishServicePort.getAllDishesByRestaurant(0, 20, 1L)).thenReturn(dishModelList);
+        when(categoryServicePort.getAllCategories()).thenReturn(categoryModelList);
+        when(restaurantServicePort.getAllRestaurants()).thenReturn(restaurantModelList);
+
+        Assertions.assertEquals(dishResponseDtos, dishHandler.getAllDishesByRestaurant(listPaginationRequest, 1L));
+
+        verify(dishResponseMapper).toResponseList(dishModelList, categoryModelList, restaurantModelList);
     }
 
 }

@@ -5,9 +5,14 @@ import com.example.plaza_comidas.domain.spi.IDishPersistencePort;
 import com.example.plaza_comidas.infrastructure.exception.DishNotFoundException;
 import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
 import com.example.plaza_comidas.infrastructure.out.jpa.entity.DishEntity;
+import com.example.plaza_comidas.infrastructure.out.jpa.entity.RestaurantEntity;
 import com.example.plaza_comidas.infrastructure.out.jpa.mapper.IDishEntityMapper;
 import com.example.plaza_comidas.infrastructure.out.jpa.repository.IDishRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -29,7 +34,7 @@ public class DishJpaAdapter implements IDishPersistencePort {
 
     @Override
     public List<DishModel> getAllDishes() {
-        List<DishEntity> dishEntityList = dishRepository.findAll();
+        List<DishEntity> dishEntityList = (List<DishEntity>) dishRepository.findAll();
 
         if (dishEntityList.isEmpty()) {
             throw new NoDataFoundException();
@@ -47,5 +52,18 @@ public class DishJpaAdapter implements IDishPersistencePort {
     @Override
     public void updateDish(DishModel dishModel) {
         dishRepository.save(dishEntityMapper.toEntity(dishModel));
+    }
+
+    @Override
+    public List<DishModel> getAllDishesByRestaurant(int pageN, int size, Long restaurantId) {
+        Pageable pagingSort = PageRequest.of(pageN, size, Sort.by("categoryId.name"));
+        Page<DishEntity> page = dishRepository.findAllByRestaurantId(restaurantId, pagingSort);
+        List<DishEntity> dishEntityList = page.getContent();
+
+        if (dishEntityList.isEmpty()) {
+            throw new NoDataFoundException();
+        }
+
+        return dishEntityMapper.toDishModelList(dishEntityList);
     }
 }

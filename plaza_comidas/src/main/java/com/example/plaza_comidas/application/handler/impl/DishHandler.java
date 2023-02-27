@@ -2,6 +2,7 @@ package com.example.plaza_comidas.application.handler.impl;
 
 import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
+import com.example.plaza_comidas.application.dto.request.ListPaginationRequest;
 import com.example.plaza_comidas.application.dto.request.UserRequestDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.handler.IDishHandler;
@@ -66,6 +67,11 @@ public class DishHandler implements IDishHandler {
     }
 
     @Override
+    public List<DishResponseDto> getAllDishesByRestaurant(ListPaginationRequest listPaginationRequest, Long restaurantId) {
+        return dishResponseMapper.toResponseList(dishServicePort.getAllDishesByRestaurant(listPaginationRequest.getPageN(), listPaginationRequest.getSize(), restaurantId), categoryServicePort.getAllCategories(), restaurantServicePort.getAllRestaurants());
+    }
+
+    @Override
     public DishResponseDto getDish(Long dishId) {
         DishModel dishModel = dishServicePort.getDish(dishId);
         return dishResponseMapper.toResponse(dishModel, categoryResponseMapper.toResponse(categoryServicePort.getCategory(dishModel.getCategoryId().getId())),
@@ -102,4 +108,6 @@ public class DishHandler implements IDishHandler {
 
         return dishResponseMapper.toResponse(newDish, categoryResponseMapper.toResponse(categoryModel), restaurantResponseMapper.toResponse(restaurantModel));
     }
+
+
 }
