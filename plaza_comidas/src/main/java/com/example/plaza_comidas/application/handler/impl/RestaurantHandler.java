@@ -1,5 +1,6 @@
 package com.example.plaza_comidas.application.handler.impl;
 
+import com.example.plaza_comidas.application.dto.request.ListPaginationRequest;
 import com.example.plaza_comidas.application.dto.request.RestaurantRequestDto;
 import com.example.plaza_comidas.application.dto.request.UserRequestDto;
 import com.example.plaza_comidas.application.dto.response.AllRestaurantResponseDto;
@@ -36,6 +37,11 @@ public class RestaurantHandler implements IRestaurantHandler {
         restaurantModel.setOwnerId(restaurantRequestDto.getOwnerId());
         RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
         return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurant.getId()));
+    }
+
+    @Override
+    public List<AllRestaurantResponseDto> getAllRestaurants(ListPaginationRequest listPaginationRequest) {
+        return restaurantResponseMapper.toResponseList(restaurantServicePort.getAllRestaurants(listPaginationRequest.getPageN(), listPaginationRequest.getSize()));
     }
 
     @Override
