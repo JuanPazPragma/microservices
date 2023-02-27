@@ -8,8 +8,15 @@ import com.example.plaza_comidas.infrastructure.out.jpa.entity.RestaurantEntity;
 import com.example.plaza_comidas.infrastructure.out.jpa.mapper.IRestaurantEntityMapper;
 import com.example.plaza_comidas.infrastructure.out.jpa.repository.IRestaurantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
@@ -30,12 +37,21 @@ public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
     }
 
     @Override
-    public List<RestaurantModel> getAllRestaurants() {
-        List<RestaurantEntity> entityList = restaurantRepository.findAll();
+    public List<RestaurantModel> getAllRestaurants(int pageN, int size) {
+        Pageable pagingSort = PageRequest.of(pageN, size, Sort.by("name"));
+        Page<RestaurantEntity> page = restaurantRepository.findAll(pagingSort);
+        List<RestaurantEntity> restaurantEntityList = page.getContent();
 
-        if (entityList.isEmpty()) {
+        if (restaurantEntityList.isEmpty()) {
             throw new NoDataFoundException();
         }
-        return restaurantEntityMapper.toRestaurantModelList(entityList);
+
+        return restaurantEntityMapper.toRestaurantModelList(restaurantEntityList);
+    }
+
+    @Override
+    public List<RestaurantModel> getAllRestaurants() {
+        Iterable<RestaurantEntity> restaurantEntities = restaurantRepository.findAll();
+        return restaurantEntityMapper.toRestaurantModelList((List<RestaurantEntity>) restaurantEntities);
     }
 }
