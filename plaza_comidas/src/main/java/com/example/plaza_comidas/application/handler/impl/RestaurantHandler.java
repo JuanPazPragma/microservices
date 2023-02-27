@@ -10,7 +10,7 @@ import com.example.plaza_comidas.application.mapper.request.IRestaurantRequestMa
 import com.example.plaza_comidas.application.mapper.response.IRestaurantResponseMapper;
 import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
-import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
+import com.example.plaza_comidas.infrastructure.exception.NoUserFoundException;
 import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,10 @@ public class RestaurantHandler implements IRestaurantHandler {
     public RestaurantResponseDto saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
         RestaurantModel restaurantModel = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
         UserRequestDto userRequestDto = userClient.getUserById(restaurantModel.getOwnerId()).getBody().getData();
+
+        if (userRequestDto == null) {
+            throw new NoUserFoundException();
+        }
 
         restaurantModel.setOwnerId(restaurantRequestDto.getOwnerId());
         RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
