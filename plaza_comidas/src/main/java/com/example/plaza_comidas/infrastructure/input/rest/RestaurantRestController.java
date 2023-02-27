@@ -1,6 +1,7 @@
 package com.example.plaza_comidas.infrastructure.input.rest;
 
 import com.example.plaza_comidas.application.dto.request.RestaurantRequestDto;
+import com.example.plaza_comidas.application.dto.response.AllRestaurantResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IRestaurantHandler;
@@ -70,8 +71,8 @@ public class RestaurantRestController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<RestaurantResponseDto>> getAllRestaurants() {
+    @GetMapping("/allrestaurants")
+    public ResponseEntity<List<AllRestaurantResponseDto>> getAllRestaurants() {
         return ResponseEntity.ok(restaurantHandler.getAllRestaurants());
     }
 

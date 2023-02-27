@@ -2,6 +2,7 @@ package com.example.plaza_comidas.application.handler.impl;
 
 import com.example.plaza_comidas.application.dto.request.RestaurantRequestDto;
 import com.example.plaza_comidas.application.dto.request.UserRequestDto;
+import com.example.plaza_comidas.application.dto.response.AllRestaurantResponseDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
 import com.example.plaza_comidas.application.handler.IRestaurantHandler;
 import com.example.plaza_comidas.application.mapper.request.IRestaurantRequestMapper;
@@ -32,18 +33,13 @@ public class RestaurantHandler implements IRestaurantHandler {
         RestaurantModel restaurantModel = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
         UserRequestDto userRequestDto = userClient.getUserById(restaurantModel.getOwnerId()).getBody().getData();
 
-        /*
-        if (userRequestDto.getRolId().getName().equalsIgnoreCase("ROLE_PROPIETARIO")) {
-            throw new NotEnoughPrivileges();
-        }
-*/
         restaurantModel.setOwnerId(restaurantRequestDto.getOwnerId());
         RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
         return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurant.getId()));
     }
 
     @Override
-    public List<RestaurantResponseDto> getAllRestaurants() {
+    public List<AllRestaurantResponseDto> getAllRestaurants() {
         return restaurantResponseMapper.toResponseList(restaurantServicePort.getAllRestaurants());
     }
 }
