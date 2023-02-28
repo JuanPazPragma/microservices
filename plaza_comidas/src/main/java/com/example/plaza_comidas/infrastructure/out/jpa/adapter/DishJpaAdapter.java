@@ -5,7 +5,6 @@ import com.example.plaza_comidas.domain.spi.IDishPersistencePort;
 import com.example.plaza_comidas.infrastructure.exception.DishNotFoundException;
 import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
 import com.example.plaza_comidas.infrastructure.out.jpa.entity.DishEntity;
-import com.example.plaza_comidas.infrastructure.out.jpa.entity.RestaurantEntity;
 import com.example.plaza_comidas.infrastructure.out.jpa.mapper.IDishEntityMapper;
 import com.example.plaza_comidas.infrastructure.out.jpa.repository.IDishRepository;
 import lombok.RequiredArgsConstructor;
