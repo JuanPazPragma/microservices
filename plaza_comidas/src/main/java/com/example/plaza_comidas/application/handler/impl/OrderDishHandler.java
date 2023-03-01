@@ -29,9 +29,9 @@ public class OrderDishHandler implements IOrderDishHandler {
     private final IOrderServicePort orderServicePort;
 
     @Override
-    public OrderDishResponseDto createOrderDish(OrderDishRequestDto orderDishRequestDto) {
+    public OrderDishResponseDto createOrderDish(OrderDishRequestDto orderDishRequestDto, Long orderId) {
         DishModel dishModel = dishServicePort.getDish(orderDishRequestDto.getDishId());
-        OrderModel orderModel = orderServicePort.getOrder(orderDishRequestDto.getOrderId());
+        OrderModel orderModel = orderServicePort.getOrder(orderId);
 
         OrderDishModel orderDishModel = orderDishRequestMapper.toOrderDish(orderDishRequestDto);
         orderDishModel.setDishId(dishModel);

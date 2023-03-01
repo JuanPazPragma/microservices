@@ -11,4 +11,5 @@ public interface IOrderServicePort {
     OrderModel getOrder(Long orderId);
 
     List<OrderModel> getAllOrdersByOrderState(OrderState orderState);
+    Boolean getAllOrdersByUserIdOrderStateIn(Long clientId, List<OrderState> orderStateList);
 }

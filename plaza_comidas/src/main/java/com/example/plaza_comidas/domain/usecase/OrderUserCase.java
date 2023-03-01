@@ -29,4 +29,9 @@ public class OrderUserCase implements IOrderServicePort {
     public List<OrderModel> getAllOrdersByOrderState(OrderState orderState) {
         return orderPersistencePort.getAllOrdersByOrderState(orderState);
     }
+
+    @Override
+    public Boolean getAllOrdersByUserIdOrderStateIn(Long clientId, List<OrderState> orderStateList) {
+        return orderPersistencePort.getAllOrdersByUserIdOrderStateIn(clientId, orderStateList);
+    }
 }

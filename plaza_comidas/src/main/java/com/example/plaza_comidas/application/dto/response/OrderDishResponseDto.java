@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderDishResponseDto {
-    private Long dishId;
+    private DishResponseDto dishId;
     private Integer amount;
 }

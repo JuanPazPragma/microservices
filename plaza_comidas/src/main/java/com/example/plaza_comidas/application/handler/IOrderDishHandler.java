@@ -6,7 +6,7 @@ import com.example.plaza_comidas.application.dto.response.OrderDishResponseDto;
 import java.util.List;
 
 public interface IOrderDishHandler {
-    OrderDishResponseDto createOrderDish(OrderDishRequestDto orderDishRequestDto);
+    OrderDishResponseDto createOrderDish(OrderDishRequestDto orderDishRequestDto, Long orderId);
 
     OrderDishResponseDto getOrderDish(Long orderDishId);
 

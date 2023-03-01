@@ -10,8 +10,6 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface IOrderDishRequestMapper {
-
-    @Mapping(source = "orderDishRequest.orderId", target = "orderId.id")
     @Mapping(source = "orderDishRequest.dishId", target = "dishId.id")
     OrderDishModel toOrderDish(OrderDishRequestDto orderDishRequest);
 }

@@ -9,5 +9,7 @@ public interface IOrderDishServicePort {
 
     OrderDishModel getOrderDish(Long orderDishId);
 
+    List<OrderDishModel> getAllOrderDish();
+
     List<OrderDishModel> getAllOrderDishByOrder(Long orderId);
 }

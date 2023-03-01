@@ -1,6 +1,7 @@
 package com.example.plaza_comidas.application.mapper.response;
 
 import com.example.plaza_comidas.application.dto.response.OrderDishResponseDto;
+import com.example.plaza_comidas.domain.model.DishModel;
 import com.example.plaza_comidas.domain.model.OrderDishModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +19,6 @@ public interface IOrderDishResponseMapper {
 
     IDishResponseMapper DISH_RESPONSE_MAPPER = Mappers.getMapper(IDishResponseMapper.class);
 
-    @Mapping(source = "orderDishModel.dishId.id", target = "dishId")
     OrderDishResponseDto toResponse(OrderDishModel orderDishModel);
 
     default List<OrderDishResponseDto> toResponseList(List<OrderDishModel> orderDishModelList) {
@@ -28,7 +28,10 @@ public interface IOrderDishResponseMapper {
                             OrderDishResponseDto orderDishResponseDto = new OrderDishResponseDto();
 
                             orderDishResponseDto.setAmount(orderDish.getAmount());
-                            orderDishResponseDto.setDishId(orderDish.getDishId().getId());
+
+                            DishModel dishModel = orderDish.getDishId();
+
+                            orderDishResponseDto.setDishId(DISH_RESPONSE_MAPPER.toResponse(dishModel, null, null));
                             return orderDishResponseDto;
 
                         }

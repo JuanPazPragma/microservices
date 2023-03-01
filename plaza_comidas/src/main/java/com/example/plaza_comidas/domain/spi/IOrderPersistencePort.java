@@ -4,6 +4,7 @@ import com.example.plaza_comidas.domain.model.OrderModel;
 import com.example.plaza_comidas.domain.model.OrderState;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IOrderPersistencePort {
     OrderModel createOrder(OrderModel orderModel);
@@ -11,4 +12,6 @@ public interface IOrderPersistencePort {
     OrderModel getOrder(Long orderId);
 
     List<OrderModel> getAllOrdersByOrderState(OrderState orderState);
+
+    Boolean getAllOrdersByUserIdOrderStateIn(Long clientId, List<OrderState> orderStateList);
 }
