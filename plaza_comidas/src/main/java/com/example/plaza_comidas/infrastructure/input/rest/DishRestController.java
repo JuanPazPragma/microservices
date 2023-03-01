@@ -3,6 +3,7 @@ package com.example.plaza_comidas.infrastructure.input.rest;
 import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
 import com.example.plaza_comidas.application.dto.request.ListPaginationRequest;
+import com.example.plaza_comidas.application.dto.response.AllRestaurantResponseDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.handler.IDishHandler;
@@ -11,7 +12,9 @@ import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
 import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import com.example.plaza_comidas.infrastructure.exception.RestaurantNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +44,10 @@ public class DishRestController {
     @Operation(summary = "Add a new dish")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Dish created", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Dish validation failed BadRequest", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Dish validation failed BadRequest", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not enough privileges", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Category not found", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Restaurant not found", content = @Content)
     })
     @RolesAllowed({"ROLE_PROPIETARIO"})
     @PostMapping("/")
@@ -82,7 +88,7 @@ public class DishRestController {
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/alldishes")
@@ -90,6 +96,15 @@ public class DishRestController {
         return ResponseEntity.ok(dishHandler.getAllDishes());
     }
 
+    @Operation(summary = "Get all restaurant dishes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All dishes listed",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = DishResponseDto.class)))),
+            @ApiResponse(responseCode = "404", description = "No data found",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+    })
     @GetMapping("/alldishes/{id}")
     public ResponseEntity<ResponseDto> getAllDishesByRestaurantId(@Valid @RequestBody ListPaginationRequest listPaginationRequest,
                                                                   @PathVariable Long id,
@@ -119,7 +134,8 @@ public class DishRestController {
     @Operation(summary = "Update an existing dish")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Dish updated", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not enough privileges", content = @Content)
     })
     @RolesAllowed({"ROLE_PROPIETARIO"})
     @PutMapping("/")

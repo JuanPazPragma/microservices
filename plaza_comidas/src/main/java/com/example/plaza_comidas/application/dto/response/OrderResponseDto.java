@@ -1,7 +1,6 @@
 package com.example.plaza_comidas.application.dto.response;
 
 import com.example.plaza_comidas.domain.model.OrderState;
-import com.example.plaza_comidas.domain.model.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 

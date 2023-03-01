@@ -9,7 +9,9 @@ import com.example.plaza_comidas.application.handler.IRestaurantHandler;
 import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
 import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,8 @@ public class RestaurantRestController {
     @Operation(summary = "Add a new restaurant")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Restaurant created", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Restaurant validation failed BadRequest", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Restaurant validation failed BadRequest", content = @Content),
+            @ApiResponse(responseCode = "400", description = "The user must be an owner", content = @Content)
     })
     @RolesAllowed({"ROLE_ADMINISTRADOR"})
     @PostMapping("/")
@@ -71,9 +74,18 @@ public class RestaurantRestController {
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get all restaurants")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All restaurants listed",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = AllRestaurantResponseDto.class)))),
+            @ApiResponse(responseCode = "404", description = "No data found",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+    })
     @GetMapping("/allrestaurants")
     public ResponseEntity<ResponseDto> getAllRestaurants(@Valid @RequestBody ListPaginationRequest listPaginationRequest,
                                                          BindingResult bindingResult) {

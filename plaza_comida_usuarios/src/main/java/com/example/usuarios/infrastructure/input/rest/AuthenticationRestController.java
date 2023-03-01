@@ -5,6 +5,12 @@ import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +31,13 @@ import java.util.stream.Collectors;
 public class AuthenticationRestController {
     private final IUserHandler userHandler;
 
+    @Operation(summary = "Create new owner")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Owner created", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Email already taken", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid register request", content = @Content),
+            @ApiResponse(responseCode = "403", description = "User with not enough privileges", content = @Content)
+    })
     @RolesAllowed({"ROLE_ADMINISTRADOR"})
     @PostMapping("/owner")
     public ResponseEntity<ResponseDto> ownerRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto,
@@ -56,6 +69,15 @@ public class AuthenticationRestController {
 
     }
 
+    @Operation(summary = "Register a new employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Employee created",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Email already taken",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+    })
     @RolesAllowed({"ROLE_PROPIETARIO"})
     @PostMapping("/employee")
     public ResponseEntity<ResponseDto> employeeRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto,
@@ -83,7 +105,7 @@ public class AuthenticationRestController {
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
 
     }
 

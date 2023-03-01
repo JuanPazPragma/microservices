@@ -11,6 +11,12 @@ import com.example.usuarios.application.dto.response.UserResponseDto;
 import com.example.usuarios.application.handler.IUserHandler;
 import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
 import com.example.usuarios.infrastructure.exception.NoDataFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +40,15 @@ public class UserRestController {
 
     private final IUserHandler userHandler;
 
+    @Operation(summary = "Register a new user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User created",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Email already taken",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+    })
     @PostMapping("/register")
     public ResponseEntity<ResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
         ResponseDto responseDto = new ResponseDto();
@@ -113,6 +128,15 @@ public class UserRestController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @Operation(summary = "Register a new client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Client created",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Email already taken",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+    })
     @PostMapping("/client")
     public ResponseEntity<ResponseDto> clientRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto, BindingResult bindingResult) {
         ResponseDto responseDto = new ResponseDto();
@@ -138,7 +162,7 @@ public class UserRestController {
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     private ResponseEntity<ResponseDto> ValidationErrors(BindingResult bindingResult, ResponseDto responseDto) {

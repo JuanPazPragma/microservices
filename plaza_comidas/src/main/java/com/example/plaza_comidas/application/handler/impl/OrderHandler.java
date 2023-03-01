@@ -19,14 +19,11 @@ import com.example.plaza_comidas.domain.model.OrderState;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
 import com.example.plaza_comidas.infrastructure.configuration.FeignClientInterceptorImp;
 import com.example.plaza_comidas.infrastructure.exception.DishNotFoundInRestaurantException;
-import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +47,10 @@ public class OrderHandler implements IOrderHandler {
     @Override
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         RestaurantModel restaurantModel = restaurantServicePort.getRestaurant(orderRequestDto.getRestaurantId());
-        UserRequestDto userRequestDto = userClient.getUserByEmail(getEmailInterceptor()).getBody().getData();
+        String tokenHeader = FeignClientInterceptorImp.getBearerTokenHeader();
+        String[] splited = tokenHeader.split("\\s+");
+        String email = jwtHandler.extractUserName(splited[1]);
+        UserRequestDto userRequestDto = userClient.getUserByEmail(email).getBody().getData();
         List<OrderState> orderStateList = Arrays.asList(OrderState.EN_PREPARACION, OrderState.PENDIENTE, OrderState.LISTO);
 
         orderServicePort.getAllOrdersByUserIdOrderStateIn(userRequestDto.getId(), orderStateList);
@@ -88,12 +88,6 @@ public class OrderHandler implements IOrderHandler {
     @Override
     public List<OrderResponseDto> getAllOrdersByOrderState(OrderState orderState) {
         return orderResponseMapper.toReponseList(orderServicePort.getAllOrdersByOrderState(orderState), restaurantServicePort.getAllRestaurants(), orderDishServicePort.getAllOrderDish());
-    }
-
-    private String getEmailInterceptor() {
-        String tokenHeader = FeignClientInterceptorImp.getBearerTokenHeader();
-        String[] splited = tokenHeader.split("\\s+");
-        return jwtHandler.extractUserName(splited[1]);
     }
 
 }
