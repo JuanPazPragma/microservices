@@ -21,6 +21,9 @@ public interface IOrderDishResponseMapper {
 
     OrderDishResponseDto toResponse(OrderDishModel orderDishModel);
 
+    List<OrderDishResponseDto> toResponseList(List<OrderDishModel> orderDishModelList);
+
+    /*
     default List<OrderDishResponseDto> toResponseList(List<OrderDishModel> orderDishModelList) {
         return orderDishModelList.stream()
                 .map(
@@ -37,4 +40,6 @@ public interface IOrderDishResponseMapper {
                         }
                 ).toList();
     }
+    */
+
 }

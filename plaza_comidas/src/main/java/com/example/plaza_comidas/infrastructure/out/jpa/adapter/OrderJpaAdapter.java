@@ -4,6 +4,7 @@ import com.example.plaza_comidas.domain.model.OrderModel;
 import com.example.plaza_comidas.domain.model.OrderState;
 import com.example.plaza_comidas.domain.spi.IOrderPersistencePort;
 import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
+import com.example.plaza_comidas.infrastructure.exception.OrderNotFoundException;
 import com.example.plaza_comidas.infrastructure.exception.UserCannotMakeAnOrderException;
 import com.example.plaza_comidas.infrastructure.out.jpa.entity.OrderEntity;
 import com.example.plaza_comidas.infrastructure.out.jpa.mapper.IOrderEntityMapper;
@@ -26,12 +27,12 @@ public class OrderJpaAdapter implements IOrderPersistencePort {
 
     @Override
     public OrderModel getOrder(Long orderId) {
-        return orderEntityMapper.toOrderModel(orderRepository.findById(orderId).orElseThrow(NoDataFoundException::new));
+        return orderEntityMapper.toOrderModel(orderRepository.findById(orderId).orElseThrow(OrderNotFoundException::new));
     }
 
     @Override
-    public List<OrderModel> getAllOrdersByOrderState(OrderState orderState) {
-        return orderEntityMapper.toOrderModelList(orderRepository.findAllByOrderState(orderState));
+    public List<OrderModel> getAllOrdersByOrderState(OrderState orderState, Long restaurantId) {
+        return orderEntityMapper.toOrderModelList(orderRepository.findAllByOrderState(orderState, restaurantId));
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.example.plaza_comidas.application.dto.request.OrderRequestDto;
 import com.example.plaza_comidas.application.dto.request.UserRequestDto;
 import com.example.plaza_comidas.application.dto.response.OrderDishResponseDto;
 import com.example.plaza_comidas.application.dto.response.OrderResponseDto;
+import com.example.plaza_comidas.application.dto.response.OrderStateResponseDto;
 import com.example.plaza_comidas.application.handler.IOrderDishHandler;
 import com.example.plaza_comidas.application.handler.IOrderHandler;
 import com.example.plaza_comidas.application.mapper.request.IOrderRequestMapper;
@@ -13,12 +14,16 @@ import com.example.plaza_comidas.application.mapper.response.IOrderDishResponseM
 import com.example.plaza_comidas.application.mapper.response.IOrderResponseMapper;
 import com.example.plaza_comidas.domain.api.IOrderDishServicePort;
 import com.example.plaza_comidas.domain.api.IOrderServicePort;
+import com.example.plaza_comidas.domain.api.IRestaurantEmployeeServicePort;
 import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
+import com.example.plaza_comidas.domain.model.OrderDishModel;
 import com.example.plaza_comidas.domain.model.OrderModel;
 import com.example.plaza_comidas.domain.model.OrderState;
+import com.example.plaza_comidas.domain.model.RestaurantEmployeeModel;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
 import com.example.plaza_comidas.infrastructure.configuration.FeignClientInterceptorImp;
 import com.example.plaza_comidas.infrastructure.exception.DishNotFoundInRestaurantException;
+import com.example.plaza_comidas.infrastructure.exception.NoDataFoundException;
 import com.example.plaza_comidas.infrastructure.input.rest.Client.IUserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +45,7 @@ public class OrderHandler implements IOrderHandler {
     private final IOrderDishServicePort orderDishServicePort;
     private final IRestaurantServicePort restaurantServicePort;
     private final IOrderDishHandler orderDishHandler;
+    private final IRestaurantEmployeeServicePort restaurantEmployeeServicePort;
     private final JwtHandler jwtHandler;
     private final IUserClient userClient;
     private final IUserRequestMapper userRequestMapper;
@@ -86,8 +92,36 @@ public class OrderHandler implements IOrderHandler {
     }
 
     @Override
-    public List<OrderResponseDto> getAllOrdersByOrderState(OrderState orderState) {
-        return orderResponseMapper.toReponseList(orderServicePort.getAllOrdersByOrderState(orderState), restaurantServicePort.getAllRestaurants(), orderDishServicePort.getAllOrderDish());
+    public List<OrderStateResponseDto> getAllOrdersByOrderState(OrderState orderState) {
+        String tokenHeader = FeignClientInterceptorImp.getBearerTokenHeader();
+        String[] splited = tokenHeader.split("\\s+");
+        String email = jwtHandler.extractUserName(splited[1]);
+        UserRequestDto userRequestDto = userClient.getUserByEmail(email).getBody().getData();
+
+        RestaurantEmployeeModel restaurantEmployeeModel = restaurantEmployeeServicePort.getRestaurantByEmployeeId(userRequestDto.getId());
+
+        return orderResponseMapper.toReponseList(orderServicePort.getAllOrdersByOrderState(orderState, restaurantEmployeeModel.getRestaurantId().getId()), restaurantServicePort.getAllRestaurants(), orderDishServicePort.getAllOrderDish());
+    }
+
+    @Override
+    public OrderResponseDto asignAnOrder(Long orderId) {
+        OrderModel orderModel = orderServicePort.getOrder(orderId);
+
+        String tokenHeader = FeignClientInterceptorImp.getBearerTokenHeader();
+        String[] splited = tokenHeader.split("\\s+");
+        String email = jwtHandler.extractUserName(splited[1]);
+        UserRequestDto userRequestDto = userClient.getUserByEmail(email).getBody().getData();
+
+        orderModel.setChefId(userRequestMapper.toUser(userRequestDto));
+        orderModel.setOrderState(OrderState.EN_PREPARACION);
+
+        OrderModel orderModelResponse = orderServicePort.createOrder(orderModel);
+
+        List<OrderDishModel> orderDishModelList = orderDishServicePort.getAllOrderDishByOrder(orderId);
+
+        List<OrderDishResponseDto> orderDishResponseDtoList = orderDishModelList.stream().map(orderDishResponseMapper::toResponse).toList();
+
+        return orderResponseMapper.toResponse(orderModelResponse, orderDishResponseDtoList);
     }
 
 }

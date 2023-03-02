@@ -95,7 +95,7 @@ class UserHandlerTest {
     }
 
     @Test
-    void throwEmailAlreadyTakenExceptionWhenAttemptToRegisterAnOwner(){
+    void throwEmailAlreadyTakenExceptionWhenAttemptToRegisterAnOwner() {
         RegisterRequestDto registerRequestDto = FactoryUserDataTest.getRegisterRequestDto();
         UserEntity userEntity = FactoryUserDataTest.getUserEntity();
 
@@ -120,13 +120,13 @@ class UserHandlerTest {
         Mockito.when(rolServicePort.getRol(any())).thenReturn(userModel.getRolId());
         Mockito.when(userResponseMapper.toResponse(any(), any())).thenReturn(userResponseDto);
 
-        Assertions.assertEquals(userResponseDto, userHandler.employeeRegister(registerRequestDto));
+        Assertions.assertEquals(userResponseDto, userHandler.employeeRegister(registerRequestDto, 1L));
 
         Mockito.verify(userServicePort).saveUser(any(UserModel.class));
     }
 
     @Test
-    void throwEmailAlreadyTakenExceptionWhenAttemptToRegisterAnEmployee(){
+    void throwEmailAlreadyTakenExceptionWhenAttemptToRegisterAnEmployee() {
         RegisterRequestDto registerRequestDto = FactoryUserDataTest.getRegisterRequestDto();
         UserEntity userEntity = FactoryUserDataTest.getUserEntity();
 
@@ -134,7 +134,7 @@ class UserHandlerTest {
 
         Assertions.assertThrows(
                 EmailAlreadyTaken.class,
-                () -> userHandler.employeeRegister(registerRequestDto)
+                () -> userHandler.employeeRegister(registerRequestDto, 1L)
         );
     }
 
@@ -157,7 +157,7 @@ class UserHandlerTest {
     }
 
     @Test
-    void throwEmailAlreadyTakenExceptionWhenAttemptToRegisterAClient(){
+    void throwEmailAlreadyTakenExceptionWhenAttemptToRegisterAClient() {
         RegisterRequestDto registerRequestDto = FactoryUserDataTest.getRegisterRequestDto();
         UserEntity userEntity = FactoryUserDataTest.getUserEntity();
 

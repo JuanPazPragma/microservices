@@ -2,6 +2,7 @@ package com.example.plaza_comidas.infrastructure.out.jpa.adapter;
 
 import com.example.plaza_comidas.domain.model.OrderDishModel;
 import com.example.plaza_comidas.domain.spi.IOrderDishPersistencePort;
+import com.example.plaza_comidas.infrastructure.out.jpa.entity.OrderDishEntity;
 import com.example.plaza_comidas.infrastructure.out.jpa.mapper.IOrderDishEntityMapper;
 import com.example.plaza_comidas.infrastructure.out.jpa.repository.IOrderDishRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class OrderDishJpaAdapter implements IOrderDishPersistencePort {
 
     @Override
     public List<OrderDishModel> getAllOrderDishByOrder(Long orderId) {
-        return orderDishEntityMapper.toOrderDishModelList(orderDishRepository.findAllByOrderId(orderId));
+        List<OrderDishEntity> orderDishEntityList = orderDishRepository.findAllByOrderId(orderId);
+        return orderDishEntityMapper.toOrderDishModelList(orderDishEntityList);
     }
 }

@@ -2,6 +2,7 @@ package com.example.plaza_comidas.infrastructure.input.rest;
 
 import com.example.plaza_comidas.application.dto.request.OrderRequestDto;
 import com.example.plaza_comidas.application.dto.response.OrderResponseDto;
+import com.example.plaza_comidas.application.dto.response.OrderStateResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.handler.IOrderHandler;
 import com.example.plaza_comidas.domain.model.OrderState;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,15 +73,30 @@ public class OrderRestController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @RolesAllowed({"ROLE_EMPLEADO"})
     @GetMapping("/get/{orderState}")
     public ResponseEntity<ResponseDto> getOrderByOrderState(@PathVariable OrderState orderState) {
         ResponseDto responseDto = new ResponseDto();
 
-        List<OrderResponseDto> orderResponseDtoList = orderHandler.getAllOrdersByOrderState(orderState);
+        List<OrderStateResponseDto> orderStateResponseDtoList = orderHandler.getAllOrdersByOrderState(orderState);
 
         responseDto.setError(false);
         responseDto.setMessage(null);
-        responseDto.setData(orderResponseDtoList);
+        responseDto.setData(orderStateResponseDtoList);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @RolesAllowed({"ROLE_EMPLEADO"})
+    @PutMapping("/asignorder/{orderId}")
+    public ResponseEntity<ResponseDto> asignOrderToEmployee(@PathVariable Long orderId) {
+        ResponseDto responseDto = new ResponseDto();
+
+        OrderResponseDto orderResponseDto = orderHandler.asignAnOrder(orderId);
+
+        responseDto.setError(false);
+        responseDto.setMessage(null);
+        responseDto.setData(orderResponseDto);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }

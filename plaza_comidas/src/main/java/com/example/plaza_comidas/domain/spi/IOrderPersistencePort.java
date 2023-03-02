@@ -11,7 +11,7 @@ public interface IOrderPersistencePort {
 
     OrderModel getOrder(Long orderId);
 
-    List<OrderModel> getAllOrdersByOrderState(OrderState orderState);
+    List<OrderModel> getAllOrdersByOrderState(OrderState orderState, Long restaurantId);
 
     Boolean getAllOrdersByUserIdOrderStateIn(Long clientId, List<OrderState> orderStateList);
 }

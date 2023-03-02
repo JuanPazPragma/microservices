@@ -2,6 +2,7 @@ package com.example.usuarios.application.handler.impl;
 
 import com.example.usuarios.application.dto.request.AuthenticationRequestDto;
 import com.example.usuarios.application.dto.request.RegisterRequestDto;
+import com.example.usuarios.application.dto.request.RestaurantEmployeeRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
 import com.example.usuarios.application.dto.response.JwtResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
@@ -14,7 +15,10 @@ import com.example.usuarios.domain.api.IRolServicePort;
 import com.example.usuarios.domain.api.IUserServicePort;
 import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
+import com.example.usuarios.infrastructure.configuration.FeignClientInterceptorImp;
 import com.example.usuarios.infrastructure.exception.EmailAlreadyTaken;
+import com.example.usuarios.infrastructure.exception.NoDataFoundException;
+import com.example.usuarios.infrastructure.input.rest.Mall.IMallService;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +28,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
+import java.util.Optional;
+
+import static java.lang.System.out;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +45,7 @@ public class UserHandler implements IUserHandler {
     private final AuthenticationManager authenticationManager;
     private final IRolResponseMapper rolResponseMapper;
     private final IRolServicePort rolServicePort;
+    private final IMallService mallService;
 
 
     @Override
@@ -105,11 +114,23 @@ public class UserHandler implements IUserHandler {
     }
 
     @Override
-    public UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto) {
+    public UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto, Long restaurantId) {
 
         if (userServicePort.findUserByEmail(registerRequestDto.getEmail()).isPresent()) {
             throw new EmailAlreadyTaken();
         }
+
+        String tokenHeader = FeignClientInterceptorImp.getBearerTokenHeader();
+        String[] splited = tokenHeader.split("\\s+");
+        String email = jwtHandler.extractUserName(splited[1]);
+
+        Optional<UserEntity> userEntityOptional = userServicePort.findUserByEmail(email);
+
+        if (userEntityOptional.isEmpty()) {
+            throw new NoDataFoundException();
+        }
+
+        UserEntity userEntity = userEntityOptional.get();
 
         UserRequestDto userRequestDto = userRequestMapper.toUserRequestDto(registerRequestDto);
 
@@ -117,7 +138,15 @@ public class UserHandler implements IUserHandler {
         RolModel rolModel = rolServicePort.getRol(3L);
         userModel.setRolId(rolModel);
 
-        return userResponseMapper.toResponse(userServicePort.saveUser(userModel), rolResponseMapper.toResponse(rolModel));
+        UserModel userModelResponse = userServicePort.saveUser(userModel);
+
+        RestaurantEmployeeRequestDto restaurantEmployeeRequestDto = new RestaurantEmployeeRequestDto();
+        restaurantEmployeeRequestDto.setEmployeeId(userModelResponse.getId());
+        restaurantEmployeeRequestDto.setRestaurantId(restaurantId);
+        restaurantEmployeeRequestDto.setOwnerId(userEntity.getId());
+        mallService.saveRestaurantEmployee(restaurantEmployeeRequestDto);
+
+        return userResponseMapper.toResponse(userModelResponse, rolResponseMapper.toResponse(rolModel));
     }
 
     @Override

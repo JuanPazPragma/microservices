@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,8 +80,9 @@ public class AuthenticationRestController {
                             array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
     })
     @RolesAllowed({"ROLE_PROPIETARIO"})
-    @PostMapping("/employee")
+    @PostMapping("/employee/{restaurantId}")
     public ResponseEntity<ResponseDto> employeeRegister(@Valid @RequestBody RegisterRequestDto registerRequestDto,
+                                                        @PathVariable Long restaurantId,
                                                         BindingResult bindingResult) {
         ResponseDto responseDto = new ResponseDto();
 
@@ -89,7 +91,7 @@ public class AuthenticationRestController {
         }
 
         try {
-            UserResponseDto userResponseDto = userHandler.employeeRegister(registerRequestDto);
+            UserResponseDto userResponseDto = userHandler.employeeRegister(registerRequestDto, restaurantId);
             responseDto.setError(false);
             responseDto.setMessage(null);
             responseDto.setData(userResponseDto);

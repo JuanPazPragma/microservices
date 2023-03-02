@@ -12,11 +12,12 @@ public interface IUserHandler {
     JwtResponseDto login(AuthenticationRequestDto authenticationRequestDto);
 
     UserResponseDto getById(Long userId);
+
     UserResponseDto getByEmail(String email);
 
     UserResponseDto ownerRegister(RegisterRequestDto registerRequestDto);
 
-    UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto);
+    UserResponseDto employeeRegister(RegisterRequestDto registerRequestDto, Long restaurantId);
 
     UserResponseDto clientRegister(RegisterRequestDto registerRequestDto);
 }

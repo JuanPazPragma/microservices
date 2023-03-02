@@ -9,9 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class OrderDishModel {
+public class RestaurantEmployeeModel {
     private Long id;
-    private OrderModel orderId;
-    private DishModel dishId;
-    private Integer amount;
+    private RestaurantModel restaurantId;
+    private UserModel employeeId;
+    private String field;
 }
