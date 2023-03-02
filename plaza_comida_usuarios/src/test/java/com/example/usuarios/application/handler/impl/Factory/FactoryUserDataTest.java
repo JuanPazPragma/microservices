@@ -2,6 +2,7 @@ package com.example.usuarios.application.handler.impl.Factory;
 
 import com.example.usuarios.application.dto.request.RegisterRequestDto;
 import com.example.usuarios.application.dto.request.UserRequestDto;
+import com.example.usuarios.application.dto.response.ResponseClientDto;
 import com.example.usuarios.application.dto.response.ResponseDto;
 import com.example.usuarios.application.dto.response.RolResponseDto;
 import com.example.usuarios.application.dto.response.UserResponseDto;
@@ -9,6 +10,8 @@ import com.example.usuarios.domain.model.RolModel;
 import com.example.usuarios.domain.model.UserModel;
 import com.example.usuarios.infrastructure.out.jpa.entity.RolEntity;
 import com.example.usuarios.infrastructure.out.jpa.entity.UserEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class FactoryUserDataTest {
 
@@ -49,7 +52,7 @@ public class FactoryUserDataTest {
         userModel.setPhone("54450");
         userModel.setEmail("juan@gmail.com");
         userModel.setPassword("1234");
-        userModel.setRolId(getRolModel(rolId,rolName));
+        userModel.setRolId(getRolModel(rolId, rolName));
 
         return userModel;
     }
@@ -63,6 +66,21 @@ public class FactoryUserDataTest {
         userEntity.setIdNumber("100");
         userEntity.setPhone("54450");
         userEntity.setEmail("juan@gmail.com");
+        userEntity.setPassword("1234");
+        userEntity.setRolId(getRolEntity());
+
+        return userEntity;
+    }
+
+    public static UserEntity getUserEntity2() {
+        UserEntity userEntity = new UserEntity();
+
+        userEntity.setId(1L);
+        userEntity.setName("Juan");
+        userEntity.setLastName("Paz");
+        userEntity.setIdNumber("100");
+        userEntity.setPhone("54450");
+        userEntity.setEmail("juan2@gmail.com");
         userEntity.setPassword("1234");
         userEntity.setRolId(getRolEntity());
 
@@ -108,7 +126,7 @@ public class FactoryUserDataTest {
         return responseDto;
     }
 
-    public static RegisterRequestDto getRegisterRequestDto(){
+    public static RegisterRequestDto getRegisterRequestDto() {
         RegisterRequestDto registerRequestDto = new RegisterRequestDto();
 
         registerRequestDto.setName("Juan");
@@ -119,6 +137,33 @@ public class FactoryUserDataTest {
         registerRequestDto.setPassword("1234");
 
         return registerRequestDto;
+    }
+
+    public static ResponseDto getResponseClientDto() {
+        ResponseDto responseClientDto = new ResponseDto();
+
+        responseClientDto.setMessage("");
+        responseClientDto.setError(false);
+        responseClientDto.setData(getUserRequestDto());
+
+        return responseClientDto;
+    }
+
+    public static ResponseEntity<ResponseDto> getResponseEntity() {
+        ResponseDto responseClientDto = getResponseClientDto();
+        return new ResponseEntity<>(responseClientDto, HttpStatus.FOUND);
+    }
+
+    public static UserResponseDto getUserRequestDto() {
+        UserResponseDto userRequestDto = new UserResponseDto();
+
+        userRequestDto.setName("Juan");
+        userRequestDto.setLastName("Paz");
+        userRequestDto.setIdNumber("123");
+        userRequestDto.setPhone("123");
+        userRequestDto.setEmail("juan@gmail.com");
+
+        return userRequestDto;
     }
 
 

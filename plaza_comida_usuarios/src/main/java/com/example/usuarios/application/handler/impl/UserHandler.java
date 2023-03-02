@@ -31,8 +31,6 @@ import javax.transaction.Transactional;
 
 import java.util.Optional;
 
-import static java.lang.System.out;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
