@@ -1,6 +1,7 @@
 package com.example.plaza_comidas.infrastructure.input.rest;
 
 import com.example.plaza_comidas.application.dto.request.OrderRequestDto;
+import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.OrderResponseDto;
 import com.example.plaza_comidas.application.dto.response.OrderStateResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
@@ -11,6 +12,12 @@ import com.example.plaza_comidas.infrastructure.exception.DishNotFoundInRestaura
 import com.example.plaza_comidas.infrastructure.exception.NotEnoughPrivileges;
 import com.example.plaza_comidas.infrastructure.exception.RestaurantNotFoundException;
 import com.example.plaza_comidas.infrastructure.exception.UserCannotMakeAnOrderException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +39,24 @@ public class OrderRestController {
 
     private final IOrderHandler orderHandler;
 
+    @Operation(summary = "Create an order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Orded created",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = OrderResponseDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Restaurant not found",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Dish not found",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Dish not found in the restaurant",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+            @ApiResponse(responseCode = "400", description = "The user cannot create another order",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = ResponseDto.class)))),
+    })
     @RolesAllowed({"ROLE_CLIENTE"})
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
@@ -70,33 +95,60 @@ public class OrderRestController {
             return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "List all orders by order state")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Orders listed",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = OrderResponseDto.class)))),
+    })
     @RolesAllowed({"ROLE_EMPLEADO"})
     @GetMapping("/get/{orderState}")
     public ResponseEntity<ResponseDto> getOrderByOrderState(@PathVariable OrderState orderState) {
         ResponseDto responseDto = new ResponseDto();
 
-        List<OrderStateResponseDto> orderStateResponseDtoList = orderHandler.getAllOrdersByOrderState(orderState);
+        try {
+            List<OrderStateResponseDto> orderStateResponseDtoList = orderHandler.getAllOrdersByOrderState(orderState);
 
-        responseDto.setError(false);
-        responseDto.setMessage(null);
-        responseDto.setData(orderStateResponseDtoList);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(orderStateResponseDtoList);
+        } catch (Exception ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno del servidor");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @Operation(summary = "Asign an order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Orded asigned",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = OrderResponseDto.class)))),
+    })
     @RolesAllowed({"ROLE_EMPLEADO"})
     @PutMapping("/asignorder/{orderId}")
     public ResponseEntity<ResponseDto> asignOrderToEmployee(@PathVariable Long orderId) {
         ResponseDto responseDto = new ResponseDto();
 
-        OrderResponseDto orderResponseDto = orderHandler.asignAnOrder(orderId);
+        try {
+            OrderResponseDto orderResponseDto = orderHandler.asignAnOrder(orderId);
 
-        responseDto.setError(false);
-        responseDto.setMessage(null);
-        responseDto.setData(orderResponseDto);
+            responseDto.setError(false);
+            responseDto.setMessage(null);
+            responseDto.setData(orderResponseDto);
+        } catch (Exception ex) {
+            responseDto.setError(true);
+            responseDto.setMessage("Error interno del servidor");
+            responseDto.setData(null);
+            return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }

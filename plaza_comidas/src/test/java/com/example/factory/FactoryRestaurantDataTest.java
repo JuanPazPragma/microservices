@@ -5,7 +5,9 @@ import com.example.plaza_comidas.application.dto.request.RolRequestDto;
 import com.example.plaza_comidas.application.dto.request.UserRequestDto;
 import com.example.plaza_comidas.application.dto.response.ResponseClientDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
+import com.example.plaza_comidas.domain.model.RestaurantEmployeeModel;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
+import com.example.plaza_comidas.domain.model.UserModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -40,7 +42,7 @@ public class FactoryRestaurantDataTest {
         return restaurantRequestDto;
     }
 
-    public static RestaurantResponseDto getRestaurantResponseDto(){
+    public static RestaurantResponseDto getRestaurantResponseDto() {
         RestaurantResponseDto restaurantResponseDto = new RestaurantResponseDto();
 
         restaurantResponseDto.setName("Corral");
@@ -132,5 +134,30 @@ public class FactoryRestaurantDataTest {
     public static ResponseEntity<ResponseClientDto> getResponseEntity() {
         ResponseClientDto responseClientDto = getResponseClientDto();
         return new ResponseEntity<>(responseClientDto, HttpStatus.FOUND);
+    }
+
+    public static RestaurantEmployeeModel getRestaurantEmployeeModel() {
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+
+        restaurantEmployeeModel.setRestaurantId(getRestaurantModel());
+        restaurantEmployeeModel.setEmployeeId(getUserModel());
+        restaurantEmployeeModel.setField("");
+
+        return restaurantEmployeeModel;
+    }
+
+    public static UserModel getUserModel() {
+        UserModel userModel = new UserModel();
+
+        userModel.setId(1L);
+        userModel.setName("Juan");
+        userModel.setLastName("Paz");
+        userModel.setIdNumber("100");
+        userModel.setPhone("123");
+        userModel.setEmail("juan@gmail.com");
+        userModel.setPassword("1234");
+        userModel.setRolId(null);
+
+        return userModel;
     }
 }

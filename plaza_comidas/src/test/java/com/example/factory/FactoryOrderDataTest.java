@@ -5,7 +5,9 @@ import com.example.plaza_comidas.application.dto.request.OrderRequestDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.OrderDishResponseDto;
 import com.example.plaza_comidas.application.dto.response.OrderResponseDto;
+import com.example.plaza_comidas.application.dto.response.OrderStateResponseDto;
 import com.example.plaza_comidas.application.dto.response.RestaurantResponseDto;
+import com.example.plaza_comidas.domain.model.OrderDishModel;
 import com.example.plaza_comidas.domain.model.OrderModel;
 import com.example.plaza_comidas.domain.model.OrderState;
 import com.example.plaza_comidas.domain.model.RestaurantModel;
@@ -122,6 +124,30 @@ public class FactoryOrderDataTest {
         return orderDishResponseDto;
     }
 
+    public static OrderDishModel getOrderDishModel() {
+        OrderDishModel orderDishModel = new OrderDishModel();
+
+        orderDishModel.setId(1L);
+        orderDishModel.setAmount(2);
+
+        return orderDishModel;
+    }
+
+    public static OrderDishResponseDto orderDishResponseDto() {
+        OrderDishResponseDto orderDishResponseDto = new OrderDishResponseDto();
+        return orderDishResponseDto;
+    }
+
+    public static OrderStateResponseDto getOrderStateResponseDto() {
+        OrderStateResponseDto orderStateResponseDto = new OrderStateResponseDto();
+
+        orderStateResponseDto.setOrderState(OrderState.PENDIENTE);
+        orderStateResponseDto.setOrderId(1L);
+        orderStateResponseDto.setDate(new Date());
+        orderStateResponseDto.setOrderDishIds(List.of(1L, 2L));
+
+        return orderStateResponseDto;
+    }
 
 
 }
