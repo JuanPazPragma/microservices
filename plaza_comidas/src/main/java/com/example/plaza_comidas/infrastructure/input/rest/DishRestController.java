@@ -3,7 +3,6 @@ package com.example.plaza_comidas.infrastructure.input.rest;
 import com.example.plaza_comidas.application.dto.request.DishRequestDto;
 import com.example.plaza_comidas.application.dto.request.DishUpdateRequestDto;
 import com.example.plaza_comidas.application.dto.request.ListPaginationRequest;
-import com.example.plaza_comidas.application.dto.response.AllRestaurantResponseDto;
 import com.example.plaza_comidas.application.dto.response.DishResponseDto;
 import com.example.plaza_comidas.application.dto.response.ResponseDto;
 import com.example.plaza_comidas.application.handler.IDishHandler;

@@ -31,7 +31,7 @@ public class DishEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity categoryId;
     private String description;
-    private Float price;
+    private Integer price;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)

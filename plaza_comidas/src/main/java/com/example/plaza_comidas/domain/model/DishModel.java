@@ -14,7 +14,7 @@ public class DishModel {
     private String name;
     private CategoryModel categoryId;
     private String description;
-    private Float price;
+    private Integer price;
     private RestaurantModel restaurantId;
     private String urlImage;
     private Boolean active;

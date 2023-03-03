@@ -9,7 +9,7 @@ public class DishResponseDto {
     private String name;
     private CategoryResponseDto categoryId;
     private String description;
-    private Float price;
+    private Integer price;
     private RestaurantResponseDto restaurantId;
     private String urlImage;
     private Boolean active;
