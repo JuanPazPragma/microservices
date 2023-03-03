@@ -28,7 +28,7 @@ public class RestaurantEmployeeEntity {
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
-    private OrderEntity restaurantId;
+    private RestaurantEntity restaurantId;
     private Long employeeId;
     private String field;
 }

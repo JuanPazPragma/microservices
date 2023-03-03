@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/dish")
-@Tag(name = "API", description = "API endpoints")
 @RequiredArgsConstructor
 public class DishRestController {
 

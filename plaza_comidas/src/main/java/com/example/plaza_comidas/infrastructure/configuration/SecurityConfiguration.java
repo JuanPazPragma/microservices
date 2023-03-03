@@ -24,7 +24,7 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1/dish/alldishes/**", "/api/v1/restaurant/allrestaurants","/api/v1/category/**","/api/v1/orderdish/**","/api/v1/order/**","/api/v1/restaurantemployee/**")
+                .antMatchers("/api/v1/dish/alldishes/**", "/api/v1/restaurant/allrestaurants","/api/v1/category/**","/api/v1/orderdish/**","/api/v1/order/**","/api/v1/restaurantemployee/**","/swagger-ui/**","/v3/api-docs/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

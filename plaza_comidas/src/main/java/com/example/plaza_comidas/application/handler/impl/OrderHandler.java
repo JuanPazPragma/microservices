@@ -12,10 +12,12 @@ import com.example.plaza_comidas.application.mapper.request.IOrderRequestMapper;
 import com.example.plaza_comidas.application.mapper.request.IUserRequestMapper;
 import com.example.plaza_comidas.application.mapper.response.IOrderDishResponseMapper;
 import com.example.plaza_comidas.application.mapper.response.IOrderResponseMapper;
+import com.example.plaza_comidas.domain.api.IDishServicePort;
 import com.example.plaza_comidas.domain.api.IOrderDishServicePort;
 import com.example.plaza_comidas.domain.api.IOrderServicePort;
 import com.example.plaza_comidas.domain.api.IRestaurantEmployeeServicePort;
 import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
+import com.example.plaza_comidas.domain.model.DishModel;
 import com.example.plaza_comidas.domain.model.OrderDishModel;
 import com.example.plaza_comidas.domain.model.OrderModel;
 import com.example.plaza_comidas.domain.model.OrderState;
@@ -49,6 +51,7 @@ public class OrderHandler implements IOrderHandler {
     private final JwtHandler jwtHandler;
     private final IUserClient userClient;
     private final IUserRequestMapper userRequestMapper;
+    private final IDishServicePort dishServicePort;
 
     @Override
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
@@ -76,7 +79,7 @@ public class OrderHandler implements IOrderHandler {
                 orderDishRequestDtoList.stream()
                         .map(orderDish -> {
 
-                            if (!Objects.equals(orderDish.getDishId(), restaurantModel.getId())) {
+                            if (!Objects.equals(dishServicePort.getDish(orderDish.getDishId()).getRestaurantId().getId(), restaurantModel.getId())) {
                                 throw new DishNotFoundInRestaurantException();
                             }
 

@@ -13,10 +13,12 @@ import com.example.plaza_comidas.application.handler.IOrderDishHandler;
 import com.example.plaza_comidas.application.mapper.request.IUserRequestMapper;
 import com.example.plaza_comidas.application.mapper.response.IOrderDishResponseMapper;
 import com.example.plaza_comidas.application.mapper.response.IOrderResponseMapper;
+import com.example.plaza_comidas.domain.api.IDishServicePort;
 import com.example.plaza_comidas.domain.api.IOrderDishServicePort;
 import com.example.plaza_comidas.domain.api.IOrderServicePort;
 import com.example.plaza_comidas.domain.api.IRestaurantEmployeeServicePort;
 import com.example.plaza_comidas.domain.api.IRestaurantServicePort;
+import com.example.plaza_comidas.domain.model.DishModel;
 import com.example.plaza_comidas.domain.model.OrderDishModel;
 import com.example.plaza_comidas.domain.model.OrderModel;
 import com.example.plaza_comidas.domain.model.OrderState;
@@ -72,6 +74,8 @@ class OrderHandlerTest {
     IOrderDishResponseMapper orderDishResponseMapper;
     @Mock
     IRestaurantEmployeeServicePort restaurantEmployeeServicePort;
+    @Mock
+    IDishServicePort dishServicePort;
 
 
     @Test
@@ -83,6 +87,7 @@ class OrderHandlerTest {
         OrderModel orderModel = FactoryOrderDataTest.getOrderModel();
         OrderResponseDto orderResponseDto = FactoryOrderDataTest.getOrderResponseDto();
         OrderDishResponseDto orderDishResponseDto = FactoryOrderDataTest.getOrderDishResponseDto();
+        DishModel dishModel = FactoryDishDataTest.getDishModle();
 
         Mockito.when(restaurantServicePort.getRestaurant(any())).thenReturn(restaurantModel);
         try (MockedStatic<FeignClientInterceptorImp> utilities = Mockito.mockStatic(FeignClientInterceptorImp.class)) {
@@ -90,6 +95,7 @@ class OrderHandlerTest {
             Mockito.when(jwtHandler.extractUserName(any())).thenReturn("email@gmail.com");
             when(userClient.getUserByEmail(any())).thenReturn(response);
             when(orderServicePort.getAllOrdersByUserIdOrderStateIn(any(), any())).thenReturn(true);
+            when(dishServicePort.getDish(anyLong())).thenReturn(dishModel);
             when(userRequestMapper.toUser(any())).thenReturn(userModel);
             when(orderServicePort.createOrder(any())).thenReturn(orderModel);
             when(orderResponseMapper.toResponse(any(), any())).thenReturn(orderResponseDto);
@@ -110,6 +116,7 @@ class OrderHandlerTest {
         UserModel userModel = FactoryOrderDataTest.getUserModel();
         OrderModel orderModel = FactoryOrderDataTest.getOrderModel();
         OrderResponseDto orderResponseDto = FactoryOrderDataTest.getOrderResponseDto();
+        DishModel dishModel = FactoryDishDataTest.getDishModle();
 
         Mockito.when(restaurantServicePort.getRestaurant(any())).thenReturn(restaurantModel);
         try (MockedStatic<FeignClientInterceptorImp> utilities = Mockito.mockStatic(FeignClientInterceptorImp.class)) {
@@ -120,6 +127,7 @@ class OrderHandlerTest {
             when(userRequestMapper.toUser(any())).thenReturn(userModel);
             when(orderServicePort.createOrder(any())).thenReturn(orderModel);
             when(orderResponseMapper.toResponse(any(), any())).thenReturn(orderResponseDto);
+            when(dishServicePort.getDish(anyLong())).thenReturn(dishModel);
 
             Assertions.assertThrows(
                     DishNotFoundInRestaurantException.class,

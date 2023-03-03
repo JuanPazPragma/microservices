@@ -34,10 +34,6 @@ public class RestaurantHandler implements IRestaurantHandler {
         RestaurantModel restaurantModel = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
         UserRequestDto userRequestDto = userClient.getUserById(restaurantModel.getOwnerId()).getBody().getData();
 
-        if (userRequestDto == null) {
-            throw new NoUserFoundException();
-        }
-
         restaurantModel.setOwnerId(restaurantRequestDto.getOwnerId());
         RestaurantModel restaurant = restaurantServicePort.saveRestaurant(restaurantModel);
         return restaurantResponseMapper.toResponse(restaurantServicePort.getRestaurant(restaurant.getId()));

@@ -23,7 +23,7 @@ public class FactoryDishDataTest {
         expectedDishModel.setName("Arroz");
         expectedDishModel.setCategoryId(getCategoryModel());
         expectedDishModel.setDescription("restaurante");
-        expectedDishModel.setPrice(200f);
+        expectedDishModel.setPrice(200);
         expectedDishModel.setRestaurantId(getRestaurantModel());
         expectedDishModel.setUrlImage("urlImage");
         expectedDishModel.setActive(true);
@@ -37,7 +37,7 @@ public class FactoryDishDataTest {
         expectedDishModel.setName("Arroz");
         expectedDishModel.setCategoryId(getCategoryModel());
         expectedDishModel.setDescription("restaurante2");
-        expectedDishModel.setPrice(200f);
+        expectedDishModel.setPrice(200);
         expectedDishModel.setRestaurantId(getRestaurantModel());
         expectedDishModel.setUrlImage("urlImage");
         expectedDishModel.setActive(true);
@@ -51,7 +51,7 @@ public class FactoryDishDataTest {
         dishRequestDto.setName("Arroz");
         dishRequestDto.setCategoryId(1L);
         dishRequestDto.setDescription("restaurante");
-        dishRequestDto.setPrice(200f);
+        dishRequestDto.setPrice(200);
         dishRequestDto.setRestaurantId(1L);
         dishRequestDto.setUrlImage("urlImage");
 
@@ -102,7 +102,7 @@ public class FactoryDishDataTest {
         dishResponseDto.setName("Arroz");
         dishResponseDto.setCategoryId(getCategoryResponseDto());
         dishResponseDto.setDescription("restaurante");
-        dishResponseDto.setPrice(200f);
+        dishResponseDto.setPrice(200);
         dishResponseDto.setRestaurantId(getRestaurantResponseDto());
         dishResponseDto.setUrlImage("urlImage");
         dishResponseDto.setActive(true);
@@ -150,7 +150,7 @@ public class FactoryDishDataTest {
 
         dishUpdateRequestDto.setId(1L);
         dishUpdateRequestDto.setDescription("restaurante2");
-        dishUpdateRequestDto.setPrice(300f);
+        dishUpdateRequestDto.setPrice(300);
 
         return dishUpdateRequestDto;
     }
@@ -161,7 +161,7 @@ public class FactoryDishDataTest {
         dishResponseDto.setName("Arroz");
         dishResponseDto.setCategoryId(getCategoryResponseDto());
         dishResponseDto.setDescription("restaurante2");
-        dishResponseDto.setPrice(300f);
+        dishResponseDto.setPrice(300);
         dishResponseDto.setRestaurantId(getRestaurantResponseDto());
         dishResponseDto.setUrlImage("urlImage");
         dishResponseDto.setActive(true);
