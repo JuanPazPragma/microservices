@@ -1,6 +1,5 @@
 package com.example.plaza_comidas.infrastructure.configuration;
 
-
 import com.example.plaza_comidas.domain.api.ICategoryServicePort;
 import com.example.plaza_comidas.domain.api.IDishServicePort;
 import com.example.plaza_comidas.domain.api.IOrderDishServicePort;
@@ -49,10 +48,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 @RequiredArgsConstructor

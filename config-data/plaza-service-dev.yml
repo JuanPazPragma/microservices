@@ -20,13 +20,6 @@ eureka:
     service-url:
       defaultZone: http://admin:admin1@localhost:8099/eureka/
 
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui-custom.html
-    operationsSorter: method
-
 appDescription: "Pragma Challenge"
 appVersion: "1.0.0"
 
